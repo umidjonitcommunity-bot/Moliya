@@ -5,7 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <meta name="description"
-    content="Personal Finance Tracker — Track income, expenses, debts, and expected income in real-time across devices.">
+    content="Personal Finance Tracker — Track income, expenses, debts, cards, cash, and expected income in real-time across devices.">
   <title>Finance Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -43,6 +43,8 @@
       --blue-glow: rgba(59, 130, 246, 0.25);
       --purple: #a855f7;
       --purple-soft: rgba(168, 85, 247, 0.12);
+      --teal: #14b8a6;
+      --teal-soft: rgba(20, 184, 166, 0.12);
       --radius: 16px;
       --radius-sm: 10px;
       --radius-xs: 8px;
@@ -166,6 +168,7 @@
     /* ===== SUMMARY CARDS ===== */
     .summary-wrapper {
       position: relative;
+      margin-bottom: 18px;
     }
 
     .summary-toggle {
@@ -193,13 +196,17 @@
 
     .summary-grid {
       display: grid;
-      gap: 12px;
-      margin-bottom: 20px;
+      gap: 10px;
       transition: var(--transition);
     }
 
-    .summary-grid.cols-3 {
-      grid-template-columns: 1fr 1fr 1fr;
+    .summary-grid.main-balances {
+      grid-template-columns: 1.2fr 1fr 1fr;
+      margin-bottom: 10px;
+    }
+
+    .summary-grid.income-expense-row {
+      grid-template-columns: 1fr 1fr;
     }
 
     .summary-grid.cols-2 {
@@ -219,7 +226,7 @@
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 16px 12px;
+      padding: 14px 10px;
       text-align: center;
       position: relative;
       overflow: hidden;
@@ -249,6 +256,15 @@
       height: 3px;
     }
 
+    .summary-card.grand-total {
+      background: linear-gradient(145deg, #1b2234, #151824);
+      border-color: rgba(59, 130, 246, 0.35);
+    }
+
+    .summary-card.grand-total::before {
+      background: linear-gradient(90deg, #3b82f6, #10b981, #8b5cf6);
+    }
+
     .summary-card.green::before {
       background: linear-gradient(90deg, var(--green), #4ade80);
     }
@@ -269,20 +285,28 @@
       background: linear-gradient(90deg, var(--purple), #c084fc);
     }
 
+    .summary-card.teal::before {
+      background: linear-gradient(90deg, var(--teal), #2dd4bf);
+    }
+
     .summary-label {
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: var(--text-secondary);
-      margin-bottom: 6px;
+      margin-bottom: 5px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
     }
 
     .summary-value {
-      font-size: 20px;
+      font-size: 18px;
       font-weight: 800;
       font-variant-numeric: tabular-nums;
       transition: filter 0.3s ease;
@@ -290,6 +314,11 @@
       overflow: hidden;
       text-overflow: ellipsis;
       display: block;
+    }
+
+    .summary-card.grand-total .summary-value {
+      font-size: 19px;
+      color: #60a5fa;
     }
 
     .summary-card.green .summary-value {
@@ -310,6 +339,138 @@
 
     .summary-card.purple .summary-value {
       color: var(--purple);
+    }
+
+    .summary-card.teal .summary-value {
+      color: var(--teal);
+    }
+
+    /* ===== CARDS & ACCOUNTS BAR ===== */
+    .cards-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 18px;
+    }
+
+    .cards-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .cards-section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-text-action {
+      background: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: 8px;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .btn-text-action:hover {
+      background: rgba(59, 130, 246, 0.2);
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .card-item-box {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      transition: var(--transition);
+      cursor: pointer;
+      position: relative;
+    }
+
+    .card-item-box:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .card-item-box.cash-type {
+      border-left: 3px solid var(--teal);
+    }
+
+    .card-item-box.card-type {
+      border-left: 3px solid var(--blue);
+    }
+
+    .card-box-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .card-box-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .card-box-balance {
+      font-size: 16px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-box-metrics {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      font-size: 11px;
+      color: var(--text-secondary);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 4px;
+    }
+
+    .card-metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-metric-in {
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    .card-metric-out {
+      color: var(--red);
+      font-weight: 600;
     }
 
     /* ===== LARGE AMOUNT DETAIL MODAL ===== */
@@ -596,6 +757,13 @@
       color: var(--green);
     }
 
+    .btn-action.pay {
+      background: var(--orange-soft);
+      color: var(--orange);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
     .btn-action.returned-badge {
       background: var(--purple-soft);
       color: var(--purple);
@@ -603,7 +771,112 @@
     }
 
     .entry-card.returned-card {
-      opacity: 0.55;
+      opacity: 0.65;
+    }
+
+    /* ===== DEBT SPECIAL STYLES ===== */
+    .debt-card-wrapper {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .debt-card-wrapper.returned-card {
+      opacity: 0.65;
+    }
+
+    .debt-main-row {
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .debt-progress-container {
+      padding: 0 16px 14px;
+    }
+
+    .debt-progress-track {
+      height: 6px;
+      background: var(--bg-input);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .debt-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--orange), var(--green));
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .debt-progress-text-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .debt-payments-history {
+      background: rgba(0, 0, 0, 0.2);
+      border-top: 1px solid var(--border);
+      padding: 10px 16px;
+    }
+
+    .debt-payments-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .debt-payment-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .debt-payment-item:last-child {
+      border-bottom: none;
+    }
+
+    .debt-payment-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .debt-payment-amount {
+      font-weight: 700;
+      color: var(--green);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .debt-payment-del {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 13px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      transition: var(--transition);
+    }
+
+    .debt-payment-del:hover {
+      color: var(--red);
+      background: var(--red-soft);
     }
 
     /* ===== EMPTY STATE ===== */
@@ -773,29 +1046,51 @@
       flex-direction: column;
       gap: 10px;
       margin: 16px 0;
-      max-height: 280px;
+      max-height: 320px;
       overflow-y: auto;
       padding-right: 4px;
     }
 
     .source-item {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 6px;
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius-sm);
-      padding: 12px 16px;
+      padding: 12px 14px;
       transition: var(--transition);
+    }
+
+    .source-item-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .source-item-name {
       font-size: 15px;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text);
       display: flex;
       align-items: center;
       gap: 8px;
+    }
+
+    .source-item-balance {
+      font-size: 16px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .source-item-breakdown {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 6px;
     }
 
     .source-item-actions {
@@ -804,9 +1099,9 @@
     }
 
     .source-item-actions .btn-action {
-      width: 34px;
-      height: 34px;
-      font-size: 14px;
+      width: 32px;
+      height: 32px;
+      font-size: 13px;
     }
 
     .type-toggle {
@@ -852,6 +1147,18 @@
       border-color: var(--red);
       background: var(--red-soft);
       color: var(--red);
+    }
+
+    .type-btn.active.card-btn {
+      border-color: var(--blue);
+      background: var(--blue-soft);
+      color: var(--blue);
+    }
+
+    .type-btn.active.cash-btn {
+      border-color: var(--teal);
+      background: var(--teal-soft);
+      color: var(--teal);
     }
 
     .btn-submit {
@@ -935,7 +1242,7 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 28px 24px;
-      max-width: 340px;
+      max-width: 360px;
       width: 100%;
       text-align: center;
       animation: scaleIn 0.2s ease;
@@ -956,27 +1263,8 @@
     .confirm-text {
       font-size: 16px;
       font-weight: 600;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       line-height: 1.5;
-    }
-
-    .confirm-input {
-      width: 100%;
-      height: 48px;
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--border);
-      background: var(--bg-input);
-      color: var(--text);
-      font-size: 16px;
-      padding: 0 16px;
-      font-family: inherit;
-      margin-bottom: 16px;
-      display: none;
-    }
-
-    .confirm-input:focus {
-      outline: none;
-      border-color: var(--blue);
     }
 
     .confirm-actions {
@@ -995,18 +1283,6 @@
       transition: var(--transition);
       position: relative;
       overflow: hidden;
-    }
-
-    .confirm-actions button::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(255, 255, 255, 0);
-      transition: var(--transition);
-    }
-
-    .confirm-actions button:active::after {
-      background: rgba(255, 255, 255, 0.15);
     }
 
     .confirm-cancel {
@@ -1159,18 +1435,6 @@
       font-family: inherit;
     }
 
-    .filter-chip::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(255, 255, 255, 0);
-      transition: var(--transition);
-    }
-
-    .filter-chip:active::after {
-      background: rgba(255, 255, 255, 0.08);
-    }
-
     .filter-chip.active {
       border-color: var(--orange);
       background: var(--orange-soft);
@@ -1230,12 +1494,17 @@
 
     /* ===== RESPONSIVE ===== */
     @media (min-width: 480px) {
-      .summary-grid.cols-3 .summary-card {
-        padding: 20px;
+      .main {
+        max-width: 580px;
+        margin: 0 auto;
+      }
+
+      .summary-card {
+        padding: 16px 12px;
       }
 
       .summary-value {
-        font-size: 24px;
+        font-size: 20px;
       }
 
       .modal {
@@ -1243,24 +1512,19 @@
         margin: auto;
         max-height: 85vh;
       }
-
-      .main {
-        max-width: 560px;
-        margin: 0 auto;
-      }
     }
 
     @media (max-width: 359px) {
-      .summary-grid.cols-3 {
+      .summary-grid.main-balances {
         grid-template-columns: 1fr;
       }
 
       .summary-label {
-        font-size: 11px;
+        font-size: 10px;
       }
 
       .summary-value {
-        font-size: 18px;
+        font-size: 16px;
       }
     }
 
@@ -1362,21 +1626,9 @@
     }
 
     @keyframes shake {
-
-      0%,
-      100% {
-        transform: translateX(0);
-      }
-
-      20%,
-      60% {
-        transform: translateX(-10px);
-      }
-
-      40%,
-      80% {
-        transform: translateX(10px);
-      }
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-10px); }
+      40%, 80% { transform: translateX(10px); }
     }
 
     .shake {
@@ -1418,28 +1670,58 @@
   <!-- MAIN CONTENT -->
   <main class="main">
 
-    <!-- ===== TAB 1: INCOME / EXPENSE ===== -->
+    <!-- ===== TAB 1: INCOME / EXPENSE & BALANCES ===== -->
     <section class="tab-content active" id="tabIncome">
       <div class="summary-wrapper">
         <button class="summary-toggle" id="toggleIncomeSummary" onclick="toggleSummary('income')"
           aria-label="Toggle summary">👁</button>
-        <div class="summary-grid cols-3" id="incomeSummaryGrid">
+        
+        <!-- Row 1: Grand Total, Cash Balance, Cards Balance -->
+        <div class="summary-grid main-balances" id="incomeSummaryGrid">
+          <div class="summary-card grand-total" onclick="showAmountDetail('grandTotal')" title="Kattaroq ko'rish">
+            <div class="summary-label" data-i18n="grandTotal">👑 Jami Balans</div>
+            <div class="summary-value" id="grandTotal">0</div>
+          </div>
+          <div class="summary-card teal" onclick="showAmountDetail('cashBalance')" title="Kattaroq ko'rish">
+            <div class="summary-label" data-i18n="cashBalance">💵 Naqd Balans</div>
+            <div class="summary-value" id="cashBalance">0</div>
+          </div>
+          <div class="summary-card blue" onclick="showAmountDetail('cardsBalance')" title="Kattaroq ko'rish">
+            <div class="summary-label" data-i18n="cardsBalance">💳 Kartalar</div>
+            <div class="summary-value" id="cardsBalance">0</div>
+          </div>
+        </div>
+
+        <!-- Row 2: Total Income, Total Expense -->
+        <div class="summary-grid income-expense-row" id="incomeExpenseGrid">
           <div class="summary-card green" onclick="showAmountDetail('income')" title="Kattaroq ko'rish">
-            <div class="summary-label" data-i18n="totalIncome">Umumiy Kirim</div>
+            <div class="summary-label" data-i18n="totalIncome">📈 Kirim</div>
             <div class="summary-value" id="totalIncome">0</div>
           </div>
           <div class="summary-card red" onclick="showAmountDetail('expense')" title="Kattaroq ko'rish">
-            <div class="summary-label" data-i18n="totalExpense">Umumiy Chiqim</div>
+            <div class="summary-label" data-i18n="totalExpense">📉 Chiqim</div>
             <div class="summary-value" id="totalExpense">0</div>
-          </div>
-          <div class="summary-card blue" onclick="showAmountDetail('balance')" title="Kattaroq ko'rish">
-            <div class="summary-label" data-i18n="balance">Balans</div>
-            <div class="summary-value" id="balance">0</div>
           </div>
         </div>
       </div>
+
+      <!-- ===== CARDS & ACCOUNTS SECTION ===== -->
+      <div class="cards-section">
+        <div class="cards-section-header">
+          <div class="cards-section-title">
+            <span>💳</span>
+            <span data-i18n="cardsAndAccounts">Kartalar va Hamyonlar</span>
+          </div>
+          <button type="button" class="btn-text-action" onclick="openSourcesModal()">
+            <span>⚙️</span>
+            <span data-i18n="manageSources">Boshqarish</span>
+          </button>
+        </div>
+        <div class="cards-grid" id="cardsBarContainer"></div>
+      </div>
+
       <div class="section-header">
-        <h2 class="section-title" data-i18n="entries">Yozuvlar</h2>
+        <h2 class="section-title" data-i18n="entries">Kirim-Chiqim Yozuvlari</h2>
         <button class="btn-add green" onclick="openModal('income')" aria-label="Add entry">＋</button>
       </div>
       <div class="entry-list" id="incomeList"></div>
@@ -1555,10 +1837,10 @@
             inputmode="decimal" required>
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="source">Manba</label>
+          <label class="form-label" data-i18n="source">Karta / Manba</label>
           <div class="source-row">
             <select class="form-select" id="incomeSource"></select>
-            <button type="button" class="btn-add-source" onclick="promptAddSource()" title="Add"
+            <button type="button" class="btn-add-source" onclick="openAddSourceModal()" title="Add"
               aria-label="Add source">＋</button>
             <button type="button" class="btn-manage-sources" onclick="openSourcesModal()" title="Manage"
               aria-label="Manage sources">⚙️</button>
@@ -1598,18 +1880,78 @@
             placeholder="Sabab / maqsad..." required>
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="source">Manba</label>
+          <label class="form-label" data-i18n="debtGivenFromSource">Qaysi kartadan/manbadan berildi?</label>
           <div class="source-row">
             <select class="form-select" id="debtSource"></select>
-            <button type="button" class="btn-add-source" onclick="promptAddSource()" title="Add"
+            <button type="button" class="btn-add-source" onclick="openAddSourceModal()" title="Add"
               aria-label="Add source">＋</button>
             <button type="button" class="btn-manage-sources" onclick="openSourcesModal()" title="Manage"
               aria-label="Manage sources">⚙️</button>
           </div>
+          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;" data-i18n="debtSourceHint">Ushbu summa tanlangan karta balansidan ayriladi.</small>
         </div>
         <button type="submit" class="btn-submit orange" id="debtSubmitBtn" data-i18n="add">Qo'shish</button>
         <button type="button" class="btn-cancel" onclick="closeModal('modalDebt')" data-i18n="cancel">Bekor
           qilish</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: ADD PARTIAL / FULL DEBT PAYMENT ===== -->
+  <div class="modal-overlay" id="modalDebtPayment">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h3 class="modal-title" id="debtPaymentModalTitle" data-i18n="addDebtPayment">Qarz to'lovini qabul qilish</h3>
+      <div style="background:var(--bg-input); border-radius:var(--radius-sm); padding:12px 14px; margin-bottom:16px; border:1px solid var(--border);">
+        <div style="font-size:13px; color:var(--text-secondary); margin-bottom:4px;" id="debtPaymentPersonName"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="font-size:13px; color:var(--text-muted);" data-i18n="remainingDebt">Qolgan qarz:</span>
+          <span style="font-size:18px; font-weight:800; color:var(--orange);" id="debtPaymentRemainingVal">0</span>
+        </div>
+      </div>
+      <form id="formDebtPayment" onsubmit="submitDebtPayment(event)">
+        <input type="hidden" id="paymentDebtId" value="">
+        <div class="form-group">
+          <label class="form-label" data-i18n="paymentAmount">To'lov miqdori</label>
+          <input type="number" class="form-input" id="debtPaymentAmount" placeholder="0" min="0.01" step="any" inputmode="decimal" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="paymentDate">To'lov sanasi</label>
+          <input type="date" class="form-input" id="debtPaymentDate" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="paymentReceivedTo">Qaysi kartaga / manbaga tushdi?</label>
+          <select class="form-select" id="debtPaymentSource"></select>
+          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;" data-i18n="paymentSourceHint">Ushbu summa tanlangan karta balansiga qo'shiladi.</small>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="paymentNote">Izoh (ixtiyoriy)</label>
+          <input type="text" class="form-input" id="debtPaymentNote" data-placeholder="paymentNotePlaceholder" placeholder="Masalan: 1-qism to'lov...">
+        </div>
+        <button type="submit" class="btn-submit green" id="debtPaymentSubmitBtn" data-i18n="savePayment">To'lovni saqlash</button>
+        <button type="button" class="btn-cancel" onclick="closeModal('modalDebtPayment')" data-i18n="cancel">Bekor qilish</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: QUICK FULL RETURN CONFIRMATION ===== -->
+  <div class="modal-overlay" id="modalReturnDebt">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h3 class="modal-title" data-i18n="confirmReturnTitle">Qarz qaytarilishini tasdiqlash</h3>
+      <div style="background:var(--bg-input); border-radius:var(--radius-sm); padding:14px; margin-bottom:16px; border:1px solid var(--border); text-align:center;">
+        <div style="font-size:15px; font-weight:700; color:var(--text); margin-bottom:4px;" id="quickReturnName"></div>
+        <div style="font-size:22px; font-weight:800; color:var(--green);" id="quickReturnAmount"></div>
+      </div>
+      <form id="formQuickReturn" onsubmit="submitQuickReturn(event)">
+        <input type="hidden" id="quickReturnDebtId" value="">
+        <div class="form-group">
+          <label class="form-label" data-i18n="paymentReceivedTo">Qaysi kartaga / manbaga tushdi?</label>
+          <select class="form-select" id="quickReturnSource"></select>
+          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;" data-i18n="paymentSourceHint">Ushbu summa tanlangan karta balansiga qo'shiladi.</small>
+        </div>
+        <button type="submit" class="btn-submit green" data-i18n="confirmFullReturn">To'liq qaytarildi deb saqlash</button>
+        <button type="button" class="btn-cancel" onclick="closeModal('modalReturnDebt')" data-i18n="cancel">Bekor qilish</button>
       </form>
     </div>
   </div>
@@ -1648,9 +1990,42 @@
       <div class="modal-handle"></div>
       <h3 class="modal-title" data-i18n="manageSources">Kartalar va Manbalar</h3>
       <div class="sources-list" id="sourcesListContainer"></div>
-      <button type="button" class="btn-submit blue" onclick="promptAddSource()" data-i18n="addNewSource">＋ Yangi
+      <button type="button" class="btn-submit blue" onclick="openAddSourceModal()" data-i18n="addNewSource">＋ Yangi
         karta/manba qo'shish</button>
-      <button type="button" class="btn-cancel" onclick="closeModal('modalSources')" data-i18n="cancel">Yopish</button>
+      <button type="button" class="btn-cancel" onclick="closeModal('modalSources')" data-i18n="close">Yopish</button>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: ADD / EDIT SINGLE SOURCE ===== -->
+  <div class="modal-overlay" id="modalSourceEdit">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h3 class="modal-title" id="sourceEditModalTitle" data-i18n="addNewSource">Karta / Manba</h3>
+      <form id="formSourceEdit" onsubmit="submitSourceEdit(event)">
+        <input type="hidden" id="sourceEditId" value="">
+        <div class="form-group">
+          <label class="form-label" data-i18n="sourceName">Karta / Manba nomi</label>
+          <input type="text" class="form-input" id="sourceEditName" data-placeholder="addSourcePlaceholder" placeholder="Masalan: Humo karta, Uzcard, Naqd..." required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="sourceType">Turi</label>
+          <div class="type-toggle">
+            <button type="button" class="type-btn card-btn active" id="sourceTypeCardBtn" onclick="setSourceType('card')">
+              <span>💳 Karta</span>
+            </button>
+            <button type="button" class="type-btn cash-btn" id="sourceTypeCashBtn" onclick="setSourceType('cash')">
+              <span>💵 Naqd pul</span>
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="initialBalance">Boshlang'ich Balans</label>
+          <input type="number" class="form-input" id="sourceEditInitial" placeholder="0" step="any" inputmode="decimal">
+          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;" data-i18n="initialBalanceHint">Kartada dastlab mavjud bo'lgan pul miqdori.</small>
+        </div>
+        <button type="submit" class="btn-submit blue" id="sourceEditSubmitBtn" data-i18n="save">Saqlash</button>
+        <button type="button" class="btn-cancel" onclick="closeModal('modalSourceEdit')" data-i18n="cancel">Bekor qilish</button>
+      </form>
     </div>
   </div>
 
@@ -1681,7 +2056,6 @@
   <div class="confirm-overlay" id="confirmOverlay">
     <div class="confirm-box">
       <div class="confirm-text" id="confirmText"></div>
-      <input class="confirm-input" id="confirmInput" type="text" placeholder="">
       <div class="confirm-actions">
         <button class="confirm-cancel" onclick="confirmCancel()" data-i18n="cancel">Bekor qilish</button>
         <button class="confirm-ok" id="confirmOk" data-i18n="confirm">Tasdiqlash</button>
@@ -1692,14 +2066,13 @@
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
-  <!-- ===== FIREBASE SDK v9 COMPAT (loaded optionally) ===== -->
+  <!-- ===== FIREBASE SDK v9 COMPAT ===== -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <script>
     // =============================================
-    // FIREBASE CONFIG — Replace with your own!
-    // Set to null or leave YOUR_API_KEY to use localStorage mode
+    // FIREBASE CONFIG
     // =============================================
     const firebaseConfig = {
       apiKey: "AIzaSyBziA_ZNz5pbL6T9hjkYngdXAMj1mNZX98",
@@ -1809,48 +2182,98 @@
     };
 
     // =============================================
-    // PAYMENT SOURCES MANAGEMENT
+    // GLOBAL CACHES
+    // =============================================
+    let cachedEntries = [];
+    let cachedDebts = [];
+    let cachedExpected = [];
+
+    // =============================================
+    // PAYMENT SOURCES & CARDS MANAGEMENT
     // =============================================
     function getSources() {
       try {
         const s = JSON.parse(localStorage.getItem('fin_sources'));
         if (Array.isArray(s) && s.length > 0) return s;
       } catch { }
-      const defaults = [{ id: 'cash', name: 'Naqd' }, { id: 'card1', name: 'Karta' }];
+      const defaults = [
+        { id: 'cash', name: 'Naqd pul', type: 'cash', initialBalance: 0 },
+        { id: 'card1', name: 'Karta (Humo/Uzcard)', type: 'card', initialBalance: 0 }
+      ];
       localStorage.setItem('fin_sources', JSON.stringify(defaults));
       return defaults;
     }
 
     function saveSources(sources) {
       localStorage.setItem('fin_sources', JSON.stringify(sources));
+      recalculateAndRenderAll();
     }
 
-    function addSource(name) {
-      const sources = getSources();
-      const id = 'src_' + Date.now().toString(36);
-      sources.push({ id, name });
-      saveSources(sources);
-      populateSourceSelects();
-      renderSourcesList();
-      return id;
+    function isCashSource(id, name, type) {
+      if (type === 'cash') return true;
+      if (type === 'card') return false;
+      const n = (name || '').toLowerCase();
+      const i = (id || '').toLowerCase();
+      return i === 'cash' || n.includes('naqd') || n.includes('naxt') || n.includes('cash') || n.includes('pul');
+    }
+
+    let currentSourceType = 'card';
+    function setSourceType(t) {
+      currentSourceType = t;
+      document.getElementById('sourceTypeCardBtn').classList.toggle('active', t === 'card');
+      document.getElementById('sourceTypeCashBtn').classList.toggle('active', t === 'cash');
+    }
+
+    function openAddSourceModal() {
+      document.getElementById('formSourceEdit').reset();
+      document.getElementById('sourceEditId').value = '';
+      document.getElementById('sourceEditModalTitle').textContent = t('addNewSource');
+      document.getElementById('sourceEditSubmitBtn').textContent = t('add');
+      setSourceType('card');
+      document.getElementById('modalSourceEdit').classList.add('active');
     }
 
     function editSource(id) {
       const sources = getSources();
       const s = sources.find(x => x.id === id);
       if (!s) return;
-      showPrompt(t('editSourcePrompt'), s.name, (val) => {
-        if (val && val.trim()) {
-          s.name = val.trim();
-          saveSources(sources);
-          populateSourceSelects();
-          renderSourcesList();
-          // re-render current lists to reflect new name in badges
-          store._notify('entries');
-          store._notify('debts');
-          showToast(t('toastSourceUpdated'));
+      document.getElementById('sourceEditId').value = s.id;
+      document.getElementById('sourceEditName').value = s.name;
+      document.getElementById('sourceEditInitial').value = s.initialBalance || 0;
+      setSourceType(isCashSource(s.id, s.name, s.type) ? 'cash' : 'card');
+      document.getElementById('sourceEditModalTitle').textContent = t('editSource');
+      document.getElementById('sourceEditSubmitBtn').textContent = t('save');
+      document.getElementById('modalSourceEdit').classList.add('active');
+    }
+
+    function submitSourceEdit(e) {
+      e.preventDefault();
+      const id = document.getElementById('sourceEditId').value;
+      const name = document.getElementById('sourceEditName').value.trim();
+      const initialBalance = parseFloat(document.getElementById('sourceEditInitial').value) || 0;
+      const type = currentSourceType;
+
+      if (!name) return;
+
+      const sources = getSources();
+      if (id) {
+        const s = sources.find(x => x.id === id);
+        if (s) {
+          s.name = name;
+          s.type = type;
+          s.initialBalance = initialBalance;
         }
-      });
+        showToast(t('toastSourceUpdated'));
+      } else {
+        const newId = 'src_' + Date.now().toString(36);
+        sources.push({ id: newId, name, type, initialBalance });
+        showToast(t('toastSourceAdded'));
+      }
+
+      saveSources(sources);
+      closeModal('modalSourceEdit');
+      renderSourcesList();
+      populateSourceSelects();
     }
 
     function deleteSource(id) {
@@ -1862,10 +2285,8 @@
       showConfirm(t('confirmDeleteSource'), true, () => {
         const filtered = sources.filter(x => x.id !== id);
         saveSources(filtered);
-        populateSourceSelects();
         renderSourcesList();
-        store._notify('entries');
-        store._notify('debts');
+        populateSourceSelects();
         showToast(t('toastSourceDeleted'));
       });
     }
@@ -1875,45 +2296,26 @@
       document.getElementById('modalSources').classList.add('active');
     }
 
-    function isCashSource(id, name) {
-      const n = (name || '').toLowerCase();
-      const i = (id || '').toLowerCase();
-      return i === 'cash' || n.includes('naqd') || n.includes('naxt') || n.includes('cash') || n.includes('pul');
-    }
-
     function getSourceBadge(id) {
       if (!id) return '';
       const sources = getSources();
       const s = sources.find(x => x.id === id);
       const name = s ? s.name : id;
-      const icon = isCashSource(id, name) ? '💵' : '💳';
+      const icon = isCashSource(id, name, s ? s.type : null) ? '💵' : '💳';
       return `<span class="entry-source">${icon} ${esc(name)}</span>`;
     }
 
-    function renderSourcesList() {
-      const container = document.getElementById('sourcesListContainer');
-      if (!container) return;
-      container.innerHTML = '';
+    function getSourceName(id) {
       const sources = getSources();
-
-      sources.forEach(s => {
-        const item = document.createElement('div');
-        item.className = 'source-item';
-        const icon = isCashSource(s.id, s.name) ? '💵' : '💳';
-        item.innerHTML = `
-          <div class="source-item-name">${icon} ${esc(s.name)}</div>
-          <div class="source-item-actions">
-            <button class="btn-action edit" onclick="editSource('${s.id}')" title="Edit" aria-label="Edit source">✏️</button>
-            <button class="btn-action delete" onclick="deleteSource('${s.id}')" title="Delete" aria-label="Delete source">🗑</button>
-          </div>
-        `;
-        container.appendChild(item);
-      });
+      const s = sources.find(x => x.id === id);
+      return s ? s.name : (id || '');
     }
 
     function populateSourceSelects() {
       const sources = getSources();
-      ['incomeSource', 'debtSource'].forEach(selId => {
+      const selectIds = ['incomeSource', 'debtSource', 'debtPaymentSource', 'quickReturnSource'];
+      
+      selectIds.forEach(selId => {
         const sel = document.getElementById(selId);
         if (!sel) return;
         const currentVal = sel.value;
@@ -1921,7 +2323,8 @@
         sources.forEach(s => {
           const opt = document.createElement('option');
           opt.value = s.id;
-          opt.textContent = s.name;
+          const icon = isCashSource(s.id, s.name, s.type) ? '💵' : '💳';
+          opt.textContent = `${icon} ${s.name}`;
           sel.appendChild(opt);
         });
         if (currentVal && sources.some(s => s.id === currentVal)) {
@@ -1932,18 +2335,271 @@
       });
     }
 
-    function getSourceName(id) {
+    // =============================================
+    // COMPREHENSIVE CARD & BALANCE CALCULATION
+    // =============================================
+    function calculateSourceStats() {
       const sources = getSources();
-      const s = sources.find(x => x.id === id);
-      return s ? s.name : (id || '');
+      const statsMap = {};
+
+      sources.forEach(s => {
+        statsMap[s.id] = {
+          id: s.id,
+          name: s.name,
+          type: isCashSource(s.id, s.name, s.type) ? 'cash' : 'card',
+          initialBalance: s.initialBalance || 0,
+          income: 0,
+          expense: 0,
+          debtGiven: 0,
+          debtRepaid: 0,
+          balance: s.initialBalance || 0
+        };
+      });
+
+      // 1. Incomes and Expenses
+      cachedEntries.forEach(e => {
+        const srcId = e.source || (sources[0] ? sources[0].id : 'cash');
+        if (!statsMap[srcId]) {
+          statsMap[srcId] = {
+            id: srcId,
+            name: srcId,
+            type: isCashSource(srcId, srcId) ? 'cash' : 'card',
+            initialBalance: 0,
+            income: 0,
+            expense: 0,
+            debtGiven: 0,
+            debtRepaid: 0,
+            balance: 0
+          };
+        }
+        if (e.type === 'income') {
+          statsMap[srcId].income += e.amount;
+          statsMap[srcId].balance += e.amount;
+        } else {
+          statsMap[srcId].expense += e.amount;
+          statsMap[srcId].balance -= e.amount;
+        }
+      });
+
+      // 2. Debts Given (Deducted from the source chosen when giving debt)
+      cachedDebts.forEach(d => {
+        const givenSrcId = d.source || (sources[0] ? sources[0].id : 'cash');
+        if (!statsMap[givenSrcId]) {
+          statsMap[givenSrcId] = {
+            id: givenSrcId,
+            name: givenSrcId,
+            type: isCashSource(givenSrcId, givenSrcId) ? 'cash' : 'card',
+            initialBalance: 0,
+            income: 0,
+            expense: 0,
+            debtGiven: 0,
+            debtRepaid: 0,
+            balance: 0
+          };
+        }
+        statsMap[givenSrcId].debtGiven += d.amount;
+        statsMap[givenSrcId].balance -= d.amount;
+
+        // 3. Debts Repaid (Partial and Full payments added to receiving source)
+        if (d.payments && Array.isArray(d.payments) && d.payments.length > 0) {
+          d.payments.forEach(p => {
+            const pSrcId = p.source || givenSrcId;
+            if (!statsMap[pSrcId]) {
+              statsMap[pSrcId] = {
+                id: pSrcId,
+                name: pSrcId,
+                type: isCashSource(pSrcId, pSrcId) ? 'cash' : 'card',
+                initialBalance: 0,
+                income: 0,
+                expense: 0,
+                debtGiven: 0,
+                debtRepaid: 0,
+                balance: 0
+              };
+            }
+            statsMap[pSrcId].debtRepaid += (p.amount || 0);
+            statsMap[pSrcId].balance += (p.amount || 0);
+          });
+        } else if (d.returned) {
+          // Legacy full return without payments array
+          const retSrcId = d.returnSource || givenSrcId;
+          if (!statsMap[retSrcId]) {
+            statsMap[retSrcId] = {
+              id: retSrcId,
+              name: retSrcId,
+              type: isCashSource(retSrcId, retSrcId) ? 'cash' : 'card',
+              initialBalance: 0,
+              income: 0,
+              expense: 0,
+              debtGiven: 0,
+              debtRepaid: 0,
+              balance: 0
+            };
+          }
+          statsMap[retSrcId].debtRepaid += d.amount;
+          statsMap[retSrcId].balance += d.amount;
+        }
+      });
+
+      let totalCash = 0;
+      let totalCards = 0;
+
+      Object.values(statsMap).forEach(s => {
+        if (s.type === 'cash') {
+          totalCash += s.balance;
+        } else {
+          totalCards += s.balance;
+        }
+      });
+
+      const grandTotal = totalCash + totalCards;
+
+      return {
+        statsMap,
+        totalCash,
+        totalCards,
+        grandTotal
+      };
     }
 
-    function promptAddSource() {
-      showPrompt(t('addSourcePrompt'), t('addSourcePlaceholder'), (val) => {
-        if (val && val.trim()) {
-          addSource(val.trim());
-          showToast(t('toastSourceAdded'));
-        }
+    function recalculateAndRenderAll() {
+      const { statsMap, totalCash, totalCards, grandTotal } = calculateSourceStats();
+
+      // Top Grand Total, Cash, Cards
+      const grandEl = document.getElementById('grandTotal');
+      const cashEl = document.getElementById('cashBalance');
+      const cardsEl = document.getElementById('cardsBalance');
+
+      if (grandEl) {
+        grandEl.textContent = (grandTotal >= 0 ? '+' : '') + formatNum(grandTotal);
+        grandEl.style.color = grandTotal >= 0 ? '#60a5fa' : 'var(--red)';
+      }
+      if (cashEl) {
+        cashEl.textContent = (totalCash >= 0 ? '+' : '') + formatNum(totalCash);
+        cashEl.style.color = totalCash >= 0 ? 'var(--teal)' : 'var(--red)';
+      }
+      if (cardsEl) {
+        cardsEl.textContent = (totalCards >= 0 ? '+' : '') + formatNum(totalCards);
+        cardsEl.style.color = totalCards >= 0 ? 'var(--blue)' : 'var(--red)';
+      }
+
+      // Render Cards bar on main screen
+      renderCardsBar(statsMap);
+    }
+
+    function renderCardsBar(statsMap) {
+      const container = document.getElementById('cardsBarContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      const sources = getSources();
+
+      sources.forEach(src => {
+        const stat = statsMap[src.id] || {
+          name: src.name,
+          type: isCashSource(src.id, src.name, src.type) ? 'cash' : 'card',
+          balance: src.initialBalance || 0,
+          income: 0,
+          expense: 0,
+          debtGiven: 0,
+          debtRepaid: 0
+        };
+
+        const icon = stat.type === 'cash' ? '💵' : '💳';
+        const typeClass = stat.type === 'cash' ? 'cash-type' : 'card-type';
+        const balColor = stat.balance >= 0 ? 'var(--green)' : 'var(--red)';
+
+        const box = document.createElement('div');
+        box.className = `card-item-box ${typeClass}`;
+        box.onclick = () => showCardDetail(stat);
+        box.title = "Karta tafsilotlarini ko'rish";
+
+        box.innerHTML = `
+          <div class="card-box-top">
+            <div class="card-box-name">${icon} ${esc(src.name)}</div>
+          </div>
+          <div class="card-box-balance" style="color:${balColor};">${stat.balance >= 0 ? '+' : ''}${formatNum(stat.balance)}</div>
+          <div class="card-box-metrics">
+            <div class="card-metric-row">
+              <span data-i18n="inShort">Kir:</span>
+              <span class="card-metric-in">+${formatNum(stat.income)}</span>
+            </div>
+            <div class="card-metric-row">
+              <span data-i18n="outShort">Chiq:</span>
+              <span class="card-metric-out">-${formatNum(stat.expense)}</span>
+            </div>
+          </div>
+        `;
+        container.appendChild(box);
+      });
+    }
+
+    function showCardDetail(stat) {
+      const badgeEl = document.getElementById('amountModalBadge');
+      const iconEl = document.getElementById('amountDetailIcon');
+      const titleEl = document.getElementById('amountDetailTitle');
+      const valEl = document.getElementById('amountDetailValue');
+      const displayEl = document.getElementById('amountModalDisplay');
+
+      const icon = stat.type === 'cash' ? '💵' : '💳';
+      const balText = (stat.balance >= 0 ? '+' : '') + formatNum(stat.balance);
+      const isPos = stat.balance >= 0;
+      const color = isPos ? 'var(--green)' : 'var(--red)';
+
+      currentDetailRawValue = balText;
+      iconEl.textContent = icon;
+      titleEl.textContent = `${stat.name} — ${t('cardBalance')}`;
+      valEl.textContent = balText;
+      valEl.style.color = color;
+
+      badgeEl.style.background = stat.type === 'cash' ? 'var(--teal-soft)' : 'var(--blue-soft)';
+      badgeEl.style.borderColor = stat.type === 'cash' ? 'rgba(20, 184, 166, 0.3)' : 'rgba(59, 130, 246, 0.3)';
+      badgeEl.style.color = stat.type === 'cash' ? 'var(--teal)' : 'var(--blue)';
+      displayEl.style.borderColor = badgeEl.style.borderColor;
+
+      const copyTxt = document.getElementById('copyAmountText');
+      if (copyTxt) copyTxt.textContent = t('copy');
+
+      document.getElementById('modalAmountDetail').classList.add('active');
+    }
+
+    function renderSourcesList() {
+      const container = document.getElementById('sourcesListContainer');
+      if (!container) return;
+      container.innerHTML = '';
+      const sources = getSources();
+      const { statsMap } = calculateSourceStats();
+
+      sources.forEach(s => {
+        const stat = statsMap[s.id] || { balance: s.initialBalance || 0, income: 0, expense: 0, debtGiven: 0, debtRepaid: 0 };
+        const icon = isCashSource(s.id, s.name, s.type) ? '💵' : '💳';
+        const balColor = stat.balance >= 0 ? 'var(--green)' : 'var(--red)';
+
+        const item = document.createElement('div');
+        item.className = 'source-item';
+        item.innerHTML = `
+          <div class="source-item-header">
+            <div class="source-item-name">
+              <span>${icon}</span>
+              <span>${esc(s.name)}</span>
+            </div>
+            <div class="source-item-actions">
+              <button class="btn-action edit" onclick="editSource('${s.id}')" title="Edit" aria-label="Edit source">✏️</button>
+              <button class="btn-action delete" onclick="deleteSource('${s.id}')" title="Delete" aria-label="Delete source">🗑</button>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:12px; color:var(--text-muted);">${t('balance')}:</span>
+            <span class="source-item-balance" style="color:${balColor};">${stat.balance >= 0 ? '+' : ''}${formatNum(stat.balance)}</span>
+          </div>
+          <div class="source-item-breakdown">
+            ${s.initialBalance ? `<span>Boshlang'ich: <b>${formatNum(s.initialBalance)}</b></span>` : ''}
+            <span>Kirim: <b style="color:var(--green)">+${formatNum(stat.income)}</b></span>
+            <span>Chiqim: <b style="color:var(--red)">-${formatNum(stat.expense)}</b></span>
+            <span>Berilgan qarz: <b style="color:var(--orange)">-${formatNum(stat.debtGiven)}</b></span>
+            <span>Qaytarilgan: <b style="color:var(--purple)">+${formatNum(stat.debtRepaid)}</b></span>
+          </div>
+        `;
+        container.appendChild(item);
       });
     }
 
@@ -1956,13 +2612,18 @@
         navIncome: 'Kirim-Chiqim',
         navDebts: 'Qarzlar',
         navExpected: 'Kutilayotgan',
-        totalIncome: 'Umumiy Kirim',
-        totalExpense: 'Umumiy Chiqim',
+        grandTotal: '👑 Jami Balans',
+        cashBalance: '💵 Naqd Balans',
+        cardsBalance: '💳 Kartalar',
+        cardsAndAccounts: 'Kartalar va Hamyonlar',
+        totalIncome: '📈 Umumiy Kirim',
+        totalExpense: '📉 Umumiy Chiqim',
         balance: 'Balans',
+        cardBalance: 'Balansi',
         totalDebts: 'Umumiy Qarzlar',
         returned: 'Qaytarilgan',
         totalExpected: 'Kutilayotgan Jami',
-        entries: 'Yozuvlar',
+        entries: 'Kirim-Chiqim Yozuvlari',
         debtList: 'Qarzlar ro\'yxati',
         expectedList: 'Kutilayotgan Kirimlar',
         addEntry: 'Yozuv qo\'shish',
@@ -1980,7 +2641,7 @@
         reason: 'Sabab',
         amount: 'Miqdor',
         name: 'Ism',
-        source: 'Manba',
+        source: 'Karta / Manba',
         add: 'Qo\'shish',
         save: 'Saqlash',
         delete: 'O\'chirish',
@@ -2002,19 +2663,39 @@
         toastSourceDeleted: 'Manba o\'chirildi',
         confirmDeleteSource: 'Ushbu kartani/manbani o\'chirmoqchimisiz?',
         cantDeleteLastSource: 'Kamida bitta manba qolishi kerak',
-        editSourcePrompt: 'Karta yoki manba nomini tahrirlang:',
-        manageSources: 'Kartalar va Manbalar',
-        addNewSource: '＋ Yangi karta/manba qo\'shish',
+        manageSources: 'Boshqarish',
+        addNewSource: '＋ Yangi karta/manba',
+        editSource: 'Kartani tahrirlash',
+        sourceName: 'Karta / Manba nomi',
+        sourceType: 'Turi',
+        initialBalance: 'Boshlang\'ich Balans',
+        initialBalanceHint: 'Kartada dastlab mavjud bo\'lgan pul miqdori.',
+        debtGivenFromSource: 'Qaysi kartadan/manbadan berildi?',
+        debtSourceHint: 'Ushbu summa tanlangan karta balansidan ayriladi.',
+        addDebtPayment: 'Qarz to\'lovini qabul qilish',
+        remainingDebt: 'Qolgan qarz:',
+        paymentAmount: 'To\'lov miqdori',
+        paymentDate: 'To\'lov sanasi',
+        paymentReceivedTo: 'Qaysi kartaga / manbaga tushdi?',
+        paymentSourceHint: 'Ushbu summa tanlangan karta balansiga qo\'shiladi.',
+        paymentNote: 'Izoh (ixtiyoriy)',
+        paymentNotePlaceholder: 'Masalan: 1-qism to\'lov...',
+        savePayment: 'To\'lovni saqlash',
+        confirmReturnTitle: 'Qarz qaytarilishini tasdiqlash',
+        confirmFullReturn: 'To\'liq qaytarildi deb saqlash',
+        debtPaymentsHistory: 'To\'lovlar tarixi',
+        inShort: 'Kir:',
+        outShort: 'Chiq:',
         reasonPlaceholder: 'Sabab yozing...',
         namePlaceholder: 'Kimga berildi...',
         debtReasonPlaceholder: 'Sabab / maqsad...',
         expectedReasonPlaceholder: 'Manba / sabab...',
         pending: 'Kutilmoqda',
         returnedLabel: 'Qaytarilgan',
+        partialPaid: 'Qisman to\'langan',
         allPersons: 'Hammasi',
         personTotal: 'umumiy qarz',
-        addSourcePrompt: 'Yangi manba nomini kiriting:',
-        addSourcePlaceholder: 'Masalan: Humo karta...',
+        addSourcePlaceholder: 'Masalan: Humo karta, Uzcard, Naqd...',
         enterPassword: 'Dasturga kirish uchun parolni kiriting',
         loginBtn: 'Kirish',
         wrongPassword: 'Parol noto\'g\'ri!',
@@ -2029,13 +2710,18 @@
         navIncome: 'Income-Expense',
         navDebts: 'Debts',
         navExpected: 'Expected',
-        totalIncome: 'Total Income',
-        totalExpense: 'Total Expense',
+        grandTotal: '👑 Total Balance',
+        cashBalance: '💵 Cash Balance',
+        cardsBalance: '💳 Cards Balance',
+        cardsAndAccounts: 'Cards & Accounts',
+        totalIncome: '📈 Total Income',
+        totalExpense: '📉 Total Expense',
         balance: 'Balance',
+        cardBalance: 'Balance',
         totalDebts: 'Total Debts',
         returned: 'Returned',
         totalExpected: 'Total Expected',
-        entries: 'Entries',
+        entries: 'Income-Expense Entries',
         debtList: 'Debt List',
         expectedList: 'Expected Income',
         addEntry: 'Add Entry',
@@ -2053,7 +2739,7 @@
         reason: 'Reason',
         amount: 'Amount',
         name: 'Name',
-        source: 'Source',
+        source: 'Card / Source',
         add: 'Add',
         save: 'Save',
         delete: 'Delete',
@@ -2073,21 +2759,41 @@
         toastSourceAdded: 'Source added',
         toastSourceUpdated: 'Source updated',
         toastSourceDeleted: 'Source deleted',
-        confirmDeleteSource: 'Are you sure you want to delete this source/card?',
+        confirmDeleteSource: 'Are you sure you want to delete this card/source?',
         cantDeleteLastSource: 'At least one source must remain',
-        editSourcePrompt: 'Edit card or source name:',
-        manageSources: 'Cards & Sources',
+        manageSources: 'Manage',
         addNewSource: '＋ Add new card/source',
+        editSource: 'Edit card/source',
+        sourceName: 'Card / Source name',
+        sourceType: 'Type',
+        initialBalance: 'Initial Balance',
+        initialBalanceHint: 'Initial amount existing in this card/account.',
+        debtGivenFromSource: 'Given from which card/source?',
+        debtSourceHint: 'This amount will be deducted from the selected card balance.',
+        addDebtPayment: 'Accept Debt Payment',
+        remainingDebt: 'Remaining debt:',
+        paymentAmount: 'Payment amount',
+        paymentDate: 'Payment date',
+        paymentReceivedTo: 'Received to which card / source?',
+        paymentSourceHint: 'This amount will be added to the selected card balance.',
+        paymentNote: 'Note (optional)',
+        paymentNotePlaceholder: 'e.g. 1st installment...',
+        savePayment: 'Save Payment',
+        confirmReturnTitle: 'Confirm Debt Return',
+        confirmFullReturn: 'Mark as Fully Returned',
+        debtPaymentsHistory: 'Payment history',
+        inShort: 'In:',
+        outShort: 'Out:',
         reasonPlaceholder: 'Enter reason...',
         namePlaceholder: 'Who was it given to...',
         debtReasonPlaceholder: 'Reason / purpose...',
         expectedReasonPlaceholder: 'Source / reason...',
         pending: 'Pending',
         returnedLabel: 'Returned',
+        partialPaid: 'Partially Paid',
         allPersons: 'All',
         personTotal: 'total debt',
-        addSourcePrompt: 'Enter new source name:',
-        addSourcePlaceholder: 'e.g. Visa card...',
+        addSourcePlaceholder: 'e.g. Visa card, Cash...',
         enterPassword: 'Enter password to access app',
         loginBtn: 'Enter',
         wrongPassword: 'Wrong password!',
@@ -2110,6 +2816,10 @@
       document.getElementById('langUz').classList.toggle('active', lang === 'uz');
       document.getElementById('langEn').classList.toggle('active', lang === 'en');
       applyTranslations();
+      recalculateAndRenderAll();
+      renderIncomeList(cachedEntries);
+      renderDebtList(cachedDebts);
+      renderExpectedList(cachedExpected);
     }
 
     function applyTranslations() {
@@ -2126,7 +2836,7 @@
     }
 
     // =============================================
-    // SUMMARY TOGGLE (show/hide values)
+    // SUMMARY TOGGLE
     // =============================================
     const summaryState = JSON.parse(localStorage.getItem('fin_summaryHidden') || '{}');
 
@@ -2137,21 +2847,39 @@
     }
 
     function applySummaryState() {
-      const map = {
-        income: { grid: 'incomeSummaryGrid', btn: 'toggleIncomeSummary' },
-        debt: { grid: 'debtSummaryGrid', btn: 'toggleDebtSummary' },
-        expected: { grid: 'expectedSummaryGrid', btn: 'toggleExpectedSummary' },
-      };
-      for (const [key, val] of Object.entries(map)) {
-        const grid = document.getElementById(val.grid);
-        const btn = document.getElementById(val.btn);
-        if (summaryState[key]) {
-          grid.classList.add('hidden-values');
-          btn.textContent = '🙈';
-        } else {
-          grid.classList.remove('hidden-values');
-          btn.textContent = '👁';
-        }
+      const incomeGrid = document.getElementById('incomeSummaryGrid');
+      const incomeExpGrid = document.getElementById('incomeExpenseGrid');
+      const debtGrid = document.getElementById('debtSummaryGrid');
+      const expectedGrid = document.getElementById('expectedSummaryGrid');
+
+      const toggleIncBtn = document.getElementById('toggleIncomeSummary');
+      const toggleDebtBtn = document.getElementById('toggleDebtSummary');
+      const toggleExpBtn = document.getElementById('toggleExpectedSummary');
+
+      if (summaryState.income) {
+        if (incomeGrid) incomeGrid.classList.add('hidden-values');
+        if (incomeExpGrid) incomeExpGrid.classList.add('hidden-values');
+        if (toggleIncBtn) toggleIncBtn.textContent = '🙈';
+      } else {
+        if (incomeGrid) incomeGrid.classList.remove('hidden-values');
+        if (incomeExpGrid) incomeExpGrid.classList.remove('hidden-values');
+        if (toggleIncBtn) toggleIncBtn.textContent = '👁';
+      }
+
+      if (summaryState.debt) {
+        if (debtGrid) debtGrid.classList.add('hidden-values');
+        if (toggleDebtBtn) toggleDebtBtn.textContent = '🙈';
+      } else {
+        if (debtGrid) debtGrid.classList.remove('hidden-values');
+        if (toggleDebtBtn) toggleDebtBtn.textContent = '👁';
+      }
+
+      if (summaryState.expected) {
+        if (expectedGrid) expectedGrid.classList.add('hidden-values');
+        if (toggleExpBtn) toggleExpBtn.textContent = '🙈';
+      } else {
+        if (expectedGrid) expectedGrid.classList.remove('hidden-values');
+        if (toggleExpBtn) toggleExpBtn.textContent = '👁';
       }
     }
 
@@ -2231,9 +2959,11 @@
     let currentDetailRawValue = '0';
 
     const DETAIL_CONFIG = {
+      grandTotal: { icon: '👑', labelKey: 'grandTotal', color: '#60a5fa', bgSoft: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.35)' },
+      cashBalance: { icon: '💵', labelKey: 'cashBalance', color: 'var(--teal)', bgSoft: 'var(--teal-soft)', border: 'rgba(20, 184, 166, 0.3)' },
+      cardsBalance: { icon: '💳', labelKey: 'cardsBalance', color: 'var(--blue)', bgSoft: 'var(--blue-soft)', border: 'rgba(59, 130, 246, 0.3)' },
       income: { icon: '📈', labelKey: 'totalIncome', color: 'var(--green)', bgSoft: 'var(--green-soft)', border: 'rgba(34, 197, 94, 0.3)' },
       expense: { icon: '📉', labelKey: 'totalExpense', color: 'var(--red)', bgSoft: 'var(--red-soft)', border: 'rgba(239, 68, 68, 0.3)' },
-      balance: { icon: '💳', labelKey: 'balance', dynamicColor: true, bgSoft: 'var(--blue-soft)', border: 'rgba(59, 130, 246, 0.3)' },
       debts: { icon: '🤝', labelKey: 'totalDebts', color: 'var(--orange)', bgSoft: 'var(--orange-soft)', border: 'rgba(245, 158, 11, 0.3)' },
       returned: { icon: '✅', labelKey: 'returned', color: 'var(--purple)', bgSoft: 'var(--purple-soft)', border: 'rgba(168, 85, 247, 0.3)' },
       expected: { icon: '⏳', labelKey: 'totalExpected', color: 'var(--blue)', bgSoft: 'var(--blue-soft)', border: 'rgba(59, 130, 246, 0.3)' },
@@ -2250,34 +2980,25 @@
       const displayEl = document.getElementById('amountModalDisplay');
 
       let valText = '0';
-      if (type === 'income') valText = document.getElementById('totalIncome').textContent;
+      if (type === 'grandTotal') valText = document.getElementById('grandTotal').textContent;
+      else if (type === 'cashBalance') valText = document.getElementById('cashBalance').textContent;
+      else if (type === 'cardsBalance') valText = document.getElementById('cardsBalance').textContent;
+      else if (type === 'income') valText = document.getElementById('totalIncome').textContent;
       else if (type === 'expense') valText = document.getElementById('totalExpense').textContent;
-      else if (type === 'balance') valText = document.getElementById('balance').textContent;
       else if (type === 'debts') valText = document.getElementById('totalDebts').textContent;
       else if (type === 'returned') valText = document.getElementById('totalReturned').textContent;
       else if (type === 'expected') valText = document.getElementById('totalExpected').textContent;
-
-      let color = cfg.color;
-      let bgSoft = cfg.bgSoft;
-      let border = cfg.border;
-
-      if (cfg.dynamicColor) {
-        const isPos = !valText.startsWith('-');
-        color = isPos ? 'var(--green)' : 'var(--red)';
-        bgSoft = isPos ? 'var(--green-soft)' : 'var(--red-soft)';
-        border = isPos ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)';
-      }
 
       currentDetailRawValue = valText;
       iconEl.textContent = cfg.icon;
       titleEl.textContent = t(cfg.labelKey);
       valEl.textContent = valText;
-      valEl.style.color = color;
+      valEl.style.color = cfg.color;
 
-      badgeEl.style.background = bgSoft;
-      badgeEl.style.borderColor = border;
-      badgeEl.style.color = color;
-      displayEl.style.borderColor = border;
+      badgeEl.style.background = cfg.bgSoft;
+      badgeEl.style.borderColor = cfg.border;
+      badgeEl.style.color = cfg.color;
+      displayEl.style.borderColor = cfg.border;
 
       const copyTxt = document.getElementById('copyAmountText');
       if (copyTxt) copyTxt.textContent = t('copy');
@@ -2372,10 +3093,9 @@
     }
 
     // =============================================
-    // CONFIRM / PROMPT DIALOG
+    // CONFIRM DIALOG
     // =============================================
     let confirmCallback = null;
-    let confirmIsPrompt = false;
 
     function showConfirm(msg, isDestructive, cb) {
       document.getElementById('confirmText').textContent = msg;
@@ -2383,26 +3103,8 @@
       okBtn.classList.toggle('red', isDestructive);
       okBtn.textContent = t('confirm');
       document.querySelector('.confirm-cancel').textContent = t('cancel');
-      document.getElementById('confirmInput').style.display = 'none';
-      confirmIsPrompt = false;
       confirmCallback = cb;
       document.getElementById('confirmOverlay').classList.add('active');
-    }
-
-    function showPrompt(msg, placeholder, cb) {
-      document.getElementById('confirmText').textContent = msg;
-      const input = document.getElementById('confirmInput');
-      input.style.display = 'block';
-      input.value = '';
-      input.placeholder = placeholder || '';
-      const okBtn = document.getElementById('confirmOk');
-      okBtn.classList.remove('red');
-      okBtn.textContent = t('add');
-      document.querySelector('.confirm-cancel').textContent = t('cancel');
-      confirmIsPrompt = true;
-      confirmCallback = cb;
-      document.getElementById('confirmOverlay').classList.add('active');
-      setTimeout(() => input.focus(), 200);
     }
 
     function confirmCancel() {
@@ -2412,13 +3114,7 @@
 
     document.getElementById('confirmOk').addEventListener('click', () => {
       document.getElementById('confirmOverlay').classList.remove('active');
-      if (confirmCallback) {
-        if (confirmIsPrompt) {
-          confirmCallback(document.getElementById('confirmInput').value);
-        } else {
-          confirmCallback();
-        }
-      }
+      if (confirmCallback) confirmCallback();
       confirmCallback = null;
     });
 
@@ -2435,14 +3131,14 @@
     }
 
     // =============================================
-    // UTILITY
+    // UTILITIES
     // =============================================
     function todayStr() {
       const d = new Date();
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
     function formatNum(n) {
-      return Number(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+      return Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
     }
     function formatDate(str) {
       if (!str) return '';
@@ -2452,12 +3148,12 @@
     }
     function esc(str) {
       const div = document.createElement('div');
-      div.textContent = str;
+      div.textContent = str || '';
       return div.innerHTML;
     }
 
     // =============================================
-    // INCOME / EXPENSE
+    // INCOME / EXPENSE LOGIC
     // =============================================
     function submitIncome(e) {
       e.preventDefault();
@@ -2504,16 +3200,17 @@
     }
 
     function renderIncomeList(entries) {
+      cachedEntries = entries || [];
       const list = document.getElementById('incomeList');
       const empty = document.getElementById('incomeEmpty');
       list.innerHTML = '';
 
-      entries.sort((a, b) => {
+      cachedEntries.sort((a, b) => {
         if (b.date !== a.date) return b.date.localeCompare(a.date);
         return (b.createdAt || 0) - (a.createdAt || 0);
       });
 
-      if (entries.length === 0) {
+      if (cachedEntries.length === 0) {
         empty.style.display = 'block';
         applyTranslations();
       } else {
@@ -2521,19 +3218,17 @@
       }
 
       let totalIn = 0, totalOut = 0;
-      entries.forEach(e => {
+      cachedEntries.forEach(e => {
         if (e.type === 'income') totalIn += e.amount;
         else totalOut += e.amount;
       });
 
       document.getElementById('totalIncome').textContent = formatNum(totalIn);
       document.getElementById('totalExpense').textContent = formatNum(totalOut);
-      const bal = totalIn - totalOut;
-      const balEl = document.getElementById('balance');
-      balEl.textContent = (bal >= 0 ? '+' : '') + formatNum(bal);
-      balEl.style.color = bal >= 0 ? 'var(--green)' : 'var(--red)';
 
-      entries.forEach(e => {
+      recalculateAndRenderAll();
+
+      cachedEntries.forEach(e => {
         const srcBadge = getSourceBadge(e.source);
         const card = document.createElement('div');
         card.className = 'entry-card';
@@ -2555,7 +3250,7 @@
     }
 
     // =============================================
-    // DEBTS
+    // DEBTS & PARTIAL PAYMENTS LOGIC
     // =============================================
     function submitDebt(e) {
       e.preventDefault();
@@ -2573,6 +3268,7 @@
         showToast(t('toastUpdated'));
       } else {
         entry.returned = false;
+        entry.payments = [];
         store.push('debts', entry);
         closeModal('modalDebt');
         showToast(t('toastAdded'));
@@ -2595,13 +3291,6 @@
       }
     }
 
-    function markDebtReturned(id) {
-      showConfirm(t('confirmReturn'), false, () => {
-        store.update('debts', id, { returned: true, returnedAt: 'SERVER_TIMESTAMP' });
-        showToast(t('toastReturned'));
-      });
-    }
-
     function deleteDebt(id) {
       showConfirm(t('confirmDelete'), true, () => {
         store.remove('debts', id);
@@ -2609,8 +3298,135 @@
       });
     }
 
+    // Open Payment Modal for Partial / Full Payment
+    function openDebtPaymentModal(debtId) {
+      const debt = cachedDebts.find(d => d.id === debtId);
+      if (!debt) return;
+
+      const { paidAmount, remainingAmount } = getDebtProgress(debt);
+      
+      document.getElementById('formDebtPayment').reset();
+      document.getElementById('paymentDebtId').value = debt.id;
+      document.getElementById('debtPaymentPersonName').textContent = `${esc(debt.name)} · ${esc(debt.reason)}`;
+      document.getElementById('debtPaymentRemainingVal').textContent = formatNum(remainingAmount);
+      document.getElementById('debtPaymentAmount').value = remainingAmount;
+      document.getElementById('debtPaymentDate').value = todayStr();
+      
+      populateSourceSelects();
+      document.getElementById('modalDebtPayment').classList.add('active');
+    }
+
+    function submitDebtPayment(e) {
+      e.preventDefault();
+      const debtId = document.getElementById('paymentDebtId').value;
+      const amount = parseFloat(document.getElementById('debtPaymentAmount').value);
+      const date = document.getElementById('debtPaymentDate').value;
+      const source = document.getElementById('debtPaymentSource').value;
+      const note = document.getElementById('debtPaymentNote').value.trim();
+
+      const debt = cachedDebts.find(d => d.id === debtId);
+      if (!debt || !amount || amount <= 0) return;
+
+      const payments = Array.isArray(debt.payments) ? [...debt.payments] : [];
+      const newPayment = {
+        id: generateId(),
+        amount: amount,
+        date: date,
+        source: source,
+        note: note,
+        createdAt: Date.now()
+      };
+      payments.push(newPayment);
+
+      const totalPaid = payments.reduce((sum, p) => sum + (p.amount || 0), 0);
+      const isReturned = totalPaid >= debt.amount;
+
+      store.update('debts', debtId, {
+        payments: payments,
+        returned: isReturned,
+        returnedAt: isReturned ? 'SERVER_TIMESTAMP' : null
+      });
+
+      closeModal('modalDebtPayment');
+      showToast(t('toastUpdated'));
+    }
+
+    function deleteDebtPayment(debtId, paymentId) {
+      const debt = cachedDebts.find(d => d.id === debtId);
+      if (!debt || !debt.payments) return;
+
+      showConfirm(t('confirmDelete'), true, () => {
+        const filtered = debt.payments.filter(p => p.id !== paymentId);
+        const totalPaid = filtered.reduce((sum, p) => sum + (p.amount || 0), 0);
+        const isReturned = totalPaid >= debt.amount;
+
+        store.update('debts', debtId, {
+          payments: filtered,
+          returned: isReturned,
+          returnedAt: isReturned ? debt.returnedAt : null
+        });
+        showToast(t('toastDeleted'));
+      });
+    }
+
+    function openQuickReturnModal(debtId) {
+      const debt = cachedDebts.find(d => d.id === debtId);
+      if (!debt) return;
+      const { remainingAmount } = getDebtProgress(debt);
+
+      document.getElementById('quickReturnDebtId').value = debt.id;
+      document.getElementById('quickReturnName').textContent = debt.name;
+      document.getElementById('quickReturnAmount').textContent = formatNum(remainingAmount);
+      
+      populateSourceSelects();
+      document.getElementById('modalReturnDebt').classList.add('active');
+    }
+
+    function submitQuickReturn(e) {
+      e.preventDefault();
+      const debtId = document.getElementById('quickReturnDebtId').value;
+      const source = document.getElementById('quickReturnSource').value;
+      const debt = cachedDebts.find(d => d.id === debtId);
+      if (!debt) return;
+
+      const { remainingAmount } = getDebtProgress(debt);
+      const payments = Array.isArray(debt.payments) ? [...debt.payments] : [];
+
+      if (remainingAmount > 0) {
+        payments.push({
+          id: generateId(),
+          amount: remainingAmount,
+          date: todayStr(),
+          source: source,
+          note: currentLang === 'uz' ? "To'liq yopildi" : "Fully closed",
+          createdAt: Date.now()
+        });
+      }
+
+      store.update('debts', debtId, {
+        payments: payments,
+        returnSource: source,
+        returned: true,
+        returnedAt: 'SERVER_TIMESTAMP'
+      });
+
+      closeModal('modalReturnDebt');
+      showToast(t('toastReturned'));
+    }
+
+    function getDebtProgress(debt) {
+      let paidAmount = 0;
+      if (debt.payments && Array.isArray(debt.payments) && debt.payments.length > 0) {
+        paidAmount = debt.payments.reduce((sum, p) => sum + (p.amount || 0), 0);
+      } else if (debt.returned) {
+        paidAmount = debt.amount;
+      }
+      const remainingAmount = Math.max(0, debt.amount - paidAmount);
+      const percent = Math.min(100, Math.round((paidAmount / (debt.amount || 1)) * 100));
+      return { paidAmount, remainingAmount, percent };
+    }
+
     let debtFilterPerson = null;
-    let allDebtsCache = [];
 
     function setDebtFilter(name) {
       debtFilterPerson = name;
@@ -2618,12 +3434,13 @@
     }
 
     function renderDebtList(debts) {
-      allDebtsCache = debts;
+      cachedDebts = debts || [];
       renderDebtListFromCache();
+      recalculateAndRenderAll();
     }
 
     function renderDebtListFromCache() {
-      const debts = allDebtsCache;
+      const debts = cachedDebts;
       const list = document.getElementById('debtList');
       const empty = document.getElementById('debtEmpty');
       const chipsContainer = document.getElementById('debtFilterChips');
@@ -2636,9 +3453,10 @@
         const n = d.name;
         if (!personMap[n]) personMap[n] = { active: 0, activeTotal: 0, all: 0 };
         personMap[n].all++;
-        if (!d.returned) {
+        const { remainingAmount } = getDebtProgress(d);
+        if (!d.returned && remainingAmount > 0) {
           personMap[n].active++;
-          personMap[n].activeTotal += d.amount;
+          personMap[n].activeTotal += remainingAmount;
         }
       });
 
@@ -2688,35 +3506,88 @@
 
       let totalActive = 0, totalRet = 0;
       debts.forEach(d => {
-        if (d.returned) totalRet += d.amount;
-        else totalActive += d.amount;
+        const { paidAmount, remainingAmount } = getDebtProgress(d);
+        totalRet += paidAmount;
+        totalActive += remainingAmount;
       });
 
       document.getElementById('totalDebts').textContent = formatNum(totalActive);
       document.getElementById('totalReturned').textContent = formatNum(totalRet);
 
       filtered.forEach(d => {
+        const { paidAmount, remainingAmount, percent } = getDebtProgress(d);
+        const isFullyReturned = d.returned || remainingAmount <= 0;
+        const isPartial = paidAmount > 0 && remainingAmount > 0;
         const srcBadge = getSourceBadge(d.source);
-        const card = document.createElement('div');
-        card.className = 'entry-card' + (d.returned ? ' returned-card' : '');
-        card.innerHTML = `
-          <div class="entry-icon ${d.returned ? 'returned' : 'debt'}">${d.returned ? '✅' : '🤝'}</div>
-          <div class="entry-info">
-            <div class="entry-reason">${esc(d.name)}</div>
-            <div class="entry-meta">${formatDate(d.date)} · ${esc(d.reason)}</div>
-            ${srcBadge}
+
+        const cardWrapper = document.createElement('div');
+        cardWrapper.className = 'debt-card-wrapper' + (isFullyReturned ? ' returned-card' : '');
+
+        let historyHtml = '';
+        if (d.payments && Array.isArray(d.payments) && d.payments.length > 0) {
+          historyHtml = `
+            <div class="debt-payments-history">
+              <div class="debt-payments-title">
+                <span>📜 ${t('debtPaymentsHistory')} (${d.payments.length})</span>
+              </div>
+              ${d.payments.map(p => `
+                <div class="debt-payment-item">
+                  <div class="debt-payment-info">
+                    <span>📅 ${formatDate(p.date)}</span>
+                    ${getSourceBadge(p.source)}
+                    ${p.note ? `<span style="color:var(--text-muted);">(${esc(p.note)})</span>` : ''}
+                  </div>
+                  <div style="display:flex; align-items:center; gap:8px;">
+                    <span class="debt-payment-amount">+${formatNum(p.amount)}</span>
+                    <button type="button" class="debt-payment-del" onclick="deleteDebtPayment('${d.id}', '${p.id}')" title="O'chirish">🗑</button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
+
+        cardWrapper.innerHTML = `
+          <div class="debt-main-row">
+            <div class="entry-icon ${isFullyReturned ? 'returned' : 'debt'}">${isFullyReturned ? '✅' : '🤝'}</div>
+            <div class="entry-info">
+              <div class="entry-reason">${esc(d.name)}</div>
+              <div class="entry-meta">${formatDate(d.date)} · ${esc(d.reason)}</div>
+              ${srcBadge}
+            </div>
+            <div style="text-align:right; flex-shrink:0;">
+              <div class="entry-amount debt">${formatNum(d.amount)}</div>
+              <div style="font-size:11px; font-weight:700; color:${isFullyReturned ? 'var(--purple)' : (isPartial ? 'var(--orange)' : 'var(--text-muted)')};">
+                ${isFullyReturned ? `✓ ${t('returnedLabel')}` : (isPartial ? `${t('partialPaid')} (${percent}%)` : t('pending'))}
+              </div>
+            </div>
+            <div class="entry-actions">
+              ${!isFullyReturned ? `
+                <button class="btn-action pay" onclick="openDebtPaymentModal('${d.id}')" title="To'lov qo'shish" aria-label="Add payment">➕</button>
+                <button class="btn-action check" onclick="openQuickReturnModal('${d.id}')" title="To'liq qaytarildi" aria-label="Mark full return">✓</button>
+              ` : `
+                <button class="btn-action returned-badge" aria-label="Returned">✓</button>
+              `}
+              <button class="btn-action edit" onclick="editDebt('${d.id}')" aria-label="Edit">✏️</button>
+              <button class="btn-action delete" onclick="deleteDebt('${d.id}')" aria-label="Delete">🗑</button>
+            </div>
           </div>
-          <div class="entry-amount debt">${formatNum(d.amount)}</div>
-          <div class="entry-actions">
-            ${d.returned
-            ? `<button class="btn-action returned-badge" aria-label="Returned">✓</button>`
-            : `<button class="btn-action check" onclick="markDebtReturned('${d.id}')" aria-label="Mark returned">✓</button>`
-          }
-            <button class="btn-action edit" onclick="editDebt('${d.id}')" aria-label="Edit">✏️</button>
-            <button class="btn-action delete" onclick="deleteDebt('${d.id}')" aria-label="Delete">🗑</button>
-          </div>
+
+          ${!isFullyReturned && (isPartial || percent > 0) ? `
+            <div class="debt-progress-container">
+              <div class="debt-progress-track">
+                <div class="debt-progress-fill" style="width:${percent}%;"></div>
+              </div>
+              <div class="debt-progress-text-row">
+                <span style="color:var(--green);">To'landi: ${formatNum(paidAmount)}</span>
+                <span style="color:var(--orange);">Qoldi: ${formatNum(remainingAmount)}</span>
+              </div>
+            </div>
+          ` : ''}
+
+          ${historyHtml}
         `;
-        list.appendChild(card);
+        list.appendChild(cardWrapper);
       });
     }
 
@@ -2766,6 +3637,7 @@
           date: date,
           reason: reason,
           amount: amount,
+          source: getSources()[0] ? getSources()[0].id : 'cash'
         };
         store.push('entries', incomeEntry);
         store.remove('expected', id);
@@ -2781,16 +3653,17 @@
     }
 
     function renderExpectedList(items) {
+      cachedExpected = items || [];
       const list = document.getElementById('expectedList');
       const empty = document.getElementById('expectedEmpty');
       list.innerHTML = '';
 
-      items.sort((a, b) => {
-        if (a.date !== b.date) return a.date.localeCompare(b.date);
-        return (a.createdAt || 0) - (b.createdAt || 0);
+      cachedExpected.sort((a, b) => {
+        if (b.date !== a.date) return b.date.localeCompare(a.date);
+        return (b.createdAt || 0) - (a.createdAt || 0);
       });
 
-      if (items.length === 0) {
+      if (cachedExpected.length === 0) {
         empty.style.display = 'block';
         applyTranslations();
       } else {
@@ -2798,10 +3671,10 @@
       }
 
       let total = 0;
-      items.forEach(i => { total += i.amount; });
+      cachedExpected.forEach(i => { total += i.amount; });
       document.getElementById('totalExpected').textContent = formatNum(total);
 
-      items.forEach(item => {
+      cachedExpected.forEach(item => {
         const card = document.createElement('div');
         card.className = 'entry-card';
         card.innerHTML = `
@@ -2855,7 +3728,7 @@
       } else {
         err.textContent = t('wrongPassword');
         card.classList.remove('shake');
-        void card.offsetWidth; // trigger reflow
+        void card.offsetWidth;
         card.classList.add('shake');
         inp.value = '';
         inp.focus();
@@ -2870,7 +3743,7 @@
     store.on('expected', renderExpectedList);
 
     // =============================================
-    // INIT
+    // INITIALIZATION
     // =============================================
     checkAuth();
     populateSourceSelects();
