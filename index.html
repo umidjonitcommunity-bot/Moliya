@@ -1571,7 +1571,7 @@
     const firebaseConfig = {
       apiKey: "AIzaSyBziA_ZNz5pbL6T9hjkYngdXAMj1mNZX98",
       authDomain: "moliya-eb9df.firebaseapp.com",
-      databaseURL: "https://moliya-eb9df-default-rtdb.firebaseio.com",
+      databaseURL: "https://console.firebase.google.com/project/moliya-eb9df/database/moliya-eb9df-default-rtdb/data/~2F",
       projectId: "moliya-eb9df",
       storageBucket: "moliya-eb9df.firebasestorage.app",
       messagingSenderId: "46013866260",
@@ -2184,11 +2184,19 @@
     }
 
     function editIncome(id) {
-      const all = lsGetAll('entries');
-      const data = all[id];
-      if (!data) return;
-      data.id = id;
-      openModal('income', data);
+      if (useFirebase) {
+        db.ref('entries/' + id).once('value', snap => {
+          if (!snap.exists()) return;
+          const data = { id, ...snap.val() };
+          openModal('income', data);
+        });
+      } else {
+        const all = lsGetAll('entries');
+        const data = all[id];
+        if (!data) return;
+        data.id = id;
+        openModal('income', data);
+      }
     }
 
     function deleteIncome(id) {
@@ -2275,11 +2283,19 @@
     }
 
     function editDebt(id) {
-      const all = lsGetAll('debts');
-      const data = all[id];
-      if (!data) return;
-      data.id = id;
-      openModal('debt', data);
+      if (useFirebase) {
+        db.ref('debts/' + id).once('value', snap => {
+          if (!snap.exists()) return;
+          const data = { id, ...snap.val() };
+          openModal('debt', data);
+        });
+      } else {
+        const all = lsGetAll('debts');
+        const data = all[id];
+        if (!data) return;
+        data.id = id;
+        openModal('debt', data);
+      }
     }
 
     function markDebtReturned(id) {
@@ -2431,11 +2447,19 @@
     }
 
     function editExpected(id) {
-      const all = lsGetAll('expected');
-      const data = all[id];
-      if (!data) return;
-      data.id = id;
-      openModal('expected', data);
+      if (useFirebase) {
+        db.ref('expected/' + id).once('value', snap => {
+          if (!snap.exists()) return;
+          const data = { id, ...snap.val() };
+          openModal('expected', data);
+        });
+      } else {
+        const all = lsGetAll('expected');
+        const data = all[id];
+        if (!data) return;
+        data.id = id;
+        openModal('expected', data);
+      }
     }
 
     function markExpectedReceived(id, amount, reason, date) {
