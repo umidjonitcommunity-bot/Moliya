@@ -367,7 +367,26 @@
       color: var(--text);
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
+    }
+
+    .btn-cards-toggle {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      width: 28px;
+      height: 28px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+    }
+
+    .btn-cards-toggle:active {
+      background: rgba(255, 255, 255, 0.15);
     }
 
     .btn-text-action {
@@ -393,6 +412,42 @@
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       gap: 10px;
+      transition: var(--transition);
+    }
+
+    .cards-grid.hidden-values .card-box-balance,
+    .cards-grid.hidden-values .card-metric-in,
+    .cards-grid.hidden-values .card-metric-out {
+      filter: blur(12px);
+      user-select: none;
+    }
+
+    .form-checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-input);
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .form-checkbox-row input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--orange);
+      cursor: pointer;
+    }
+
+    .form-checkbox-row label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      margin-bottom: 0;
+      flex: 1;
     }
 
     .card-item-box {
@@ -1711,6 +1766,7 @@
           <div class="cards-section-title">
             <span>💳</span>
             <span data-i18n="cardsAndAccounts">Kartalar va Hamyonlar</span>
+            <button type="button" class="btn-cards-toggle" id="toggleCardsSummary" onclick="toggleSummary('cards')" title="Yashirish / Ko'rsatish" aria-label="Toggle cards visibility">👁</button>
           </div>
           <button type="button" class="btn-text-action" onclick="openSourcesModal()">
             <span>⚙️</span>
@@ -1888,7 +1944,13 @@
             <button type="button" class="btn-manage-sources" onclick="openSourcesModal()" title="Manage"
               aria-label="Manage sources">⚙️</button>
           </div>
-          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;" data-i18n="debtSourceHint">Ushbu summa tanlangan karta balansidan ayriladi.</small>
+        </div>
+        <div class="form-group">
+          <div class="form-checkbox-row" onclick="event.target.tagName !== 'INPUT' && (document.getElementById('debtAffectBalance').checked = !document.getElementById('debtAffectBalance').checked)">
+            <input type="checkbox" id="debtAffectBalance" checked>
+            <label for="debtAffectBalance" data-i18n="debtAffectBalance">Karta/hisob balansidan ayirilsin</label>
+          </div>
+          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;" data-i18n="debtAffectBalanceHint">Belgilansa, qarz summasi kartadan ayriladi va qaytarilganda kartaga qo'shiladi.</small>
         </div>
         <button type="submit" class="btn-submit orange" id="debtSubmitBtn" data-i18n="add">Qo'shish</button>
         <button type="button" class="btn-cancel" onclick="closeModal('modalDebt')" data-i18n="cancel">Bekor
@@ -2381,8 +2443,9 @@
         }
       });
 
-      // 2. Debts Given (Deducted from the source chosen when giving debt)
+      // 2. Debts Given (Deducted from the source chosen when giving debt, if affectBalance !== false)
       cachedDebts.forEach(d => {
+        const affect = d.affectBalance !== false; // default is true
         const givenSrcId = d.source || (sources[0] ? sources[0].id : 'cash');
         if (!statsMap[givenSrcId]) {
           statsMap[givenSrcId] = {
@@ -2397,10 +2460,12 @@
             balance: 0
           };
         }
-        statsMap[givenSrcId].debtGiven += d.amount;
-        statsMap[givenSrcId].balance -= d.amount;
+        if (affect) {
+          statsMap[givenSrcId].debtGiven += d.amount;
+          statsMap[givenSrcId].balance -= d.amount;
+        }
 
-        // 3. Debts Repaid (Partial and Full payments added to receiving source)
+        // 3. Debts Repaid (Partial and Full payments added to receiving source, if affectBalance !== false)
         if (d.payments && Array.isArray(d.payments) && d.payments.length > 0) {
           d.payments.forEach(p => {
             const pSrcId = p.source || givenSrcId;
@@ -2417,8 +2482,10 @@
                 balance: 0
               };
             }
-            statsMap[pSrcId].debtRepaid += (p.amount || 0);
-            statsMap[pSrcId].balance += (p.amount || 0);
+            if (affect) {
+              statsMap[pSrcId].debtRepaid += (p.amount || 0);
+              statsMap[pSrcId].balance += (p.amount || 0);
+            }
           });
         } else if (d.returned) {
           // Legacy full return without payments array
@@ -2436,8 +2503,10 @@
               balance: 0
             };
           }
-          statsMap[retSrcId].debtRepaid += d.amount;
-          statsMap[retSrcId].balance += d.amount;
+          if (affect) {
+            statsMap[retSrcId].debtRepaid += d.amount;
+            statsMap[retSrcId].balance += d.amount;
+          }
         }
       });
 
@@ -2531,6 +2600,8 @@
         `;
         container.appendChild(box);
       });
+
+      applySummaryState();
     }
 
     function showCardDetail(stat) {
@@ -2672,6 +2743,9 @@
         initialBalanceHint: 'Kartada dastlab mavjud bo\'lgan pul miqdori.',
         debtGivenFromSource: 'Qaysi kartadan/manbadan berildi?',
         debtSourceHint: 'Ushbu summa tanlangan karta balansidan ayriladi.',
+        debtAffectBalance: 'Karta/hisob balansidan ayirilsin',
+        debtAffectBalanceHint: 'Belgilansa, qarz summasi kartadan ayriladi va qaytarilganda kartaga qo\'shiladi.',
+        noBalanceImpact: 'Balansga ta\'sirsiz',
         addDebtPayment: 'Qarz to\'lovini qabul qilish',
         remainingDebt: 'Qolgan qarz:',
         paymentAmount: 'To\'lov miqdori',
@@ -2770,6 +2844,9 @@
         initialBalanceHint: 'Initial amount existing in this card/account.',
         debtGivenFromSource: 'Given from which card/source?',
         debtSourceHint: 'This amount will be deducted from the selected card balance.',
+        debtAffectBalance: 'Deduct from card/account balance',
+        debtAffectBalanceHint: 'If checked, debt will deduct from balance and return will add to balance.',
+        noBalanceImpact: 'No balance impact',
         addDebtPayment: 'Accept Debt Payment',
         remainingDebt: 'Remaining debt:',
         paymentAmount: 'Payment amount',
@@ -2851,10 +2928,12 @@
       const incomeExpGrid = document.getElementById('incomeExpenseGrid');
       const debtGrid = document.getElementById('debtSummaryGrid');
       const expectedGrid = document.getElementById('expectedSummaryGrid');
+      const cardsGrid = document.getElementById('cardsBarContainer');
 
       const toggleIncBtn = document.getElementById('toggleIncomeSummary');
       const toggleDebtBtn = document.getElementById('toggleDebtSummary');
       const toggleExpBtn = document.getElementById('toggleExpectedSummary');
+      const toggleCardsBtn = document.getElementById('toggleCardsSummary');
 
       if (summaryState.income) {
         if (incomeGrid) incomeGrid.classList.add('hidden-values');
@@ -2864,6 +2943,14 @@
         if (incomeGrid) incomeGrid.classList.remove('hidden-values');
         if (incomeExpGrid) incomeExpGrid.classList.remove('hidden-values');
         if (toggleIncBtn) toggleIncBtn.textContent = '👁';
+      }
+
+      if (summaryState.cards) {
+        if (cardsGrid) cardsGrid.classList.add('hidden-values');
+        if (toggleCardsBtn) toggleCardsBtn.textContent = '🙈';
+      } else {
+        if (cardsGrid) cardsGrid.classList.remove('hidden-values');
+        if (toggleCardsBtn) toggleCardsBtn.textContent = '👁';
       }
 
       if (summaryState.debt) {
@@ -2921,6 +3008,7 @@
         document.getElementById('debtDate').value = isEdit ? editData.date : todayStr();
         document.getElementById('debtReason').value = isEdit ? editData.reason : '';
         if (isEdit && editData.source) document.getElementById('debtSource').value = editData.source;
+        document.getElementById('debtAffectBalance').checked = isEdit ? (editData.affectBalance !== false) : true;
 
         document.getElementById('modalDebtTitle').textContent = t(isEdit ? 'editDebt' : 'addDebt');
         document.getElementById('debtSubmitBtn').textContent = t(isEdit ? 'save' : 'add');
@@ -3261,6 +3349,7 @@
         date: document.getElementById('debtDate').value,
         reason: document.getElementById('debtReason').value.trim(),
         source: document.getElementById('debtSource').value,
+        affectBalance: document.getElementById('debtAffectBalance').checked,
       };
       if (editId) {
         store.update('debts', editId, entry);
@@ -3519,6 +3608,7 @@
         const isFullyReturned = d.returned || remainingAmount <= 0;
         const isPartial = paidAmount > 0 && remainingAmount > 0;
         const srcBadge = getSourceBadge(d.source);
+        const noAffectBadge = d.affectBalance === false ? `<span class="entry-source" style="background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.25);">🚫 ${t('noBalanceImpact')}</span>` : '';
 
         const cardWrapper = document.createElement('div');
         cardWrapper.className = 'debt-card-wrapper' + (isFullyReturned ? ' returned-card' : '');
@@ -3553,7 +3643,7 @@
             <div class="entry-info">
               <div class="entry-reason">${esc(d.name)}</div>
               <div class="entry-meta">${formatDate(d.date)} · ${esc(d.reason)}</div>
-              ${srcBadge}
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">${srcBadge}${noAffectBadge}</div>
             </div>
             <div style="text-align:right; flex-shrink:0;">
               <div class="entry-amount debt">${formatNum(d.amount)}</div>
