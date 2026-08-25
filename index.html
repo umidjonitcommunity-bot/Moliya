@@ -219,11 +219,25 @@
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 16px;
+      padding: 16px 12px;
       text-align: center;
       position: relative;
       overflow: hidden;
       transition: var(--transition);
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .summary-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.2);
+      box-shadow: var(--shadow);
+    }
+
+    .summary-card:active {
+      transform: scale(0.97);
+      background: var(--bg-card-hover);
     }
 
     .summary-card::before {
@@ -262,6 +276,9 @@
       letter-spacing: 0.5px;
       color: var(--text-secondary);
       margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .summary-value {
@@ -269,6 +286,10 @@
       font-weight: 800;
       font-variant-numeric: tabular-nums;
       transition: filter 0.3s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
     }
 
     .summary-card.green .summary-value {
@@ -289,6 +310,70 @@
 
     .summary-card.purple .summary-value {
       color: var(--purple);
+    }
+
+    /* ===== LARGE AMOUNT DETAIL MODAL ===== */
+    .amount-modal-box {
+      text-align: center;
+      padding: 8px 4px 12px;
+    }
+
+    .amount-modal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 18px;
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      color: var(--text);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .amount-modal-display {
+      background: var(--bg-input);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 16px;
+      margin-bottom: 20px;
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+      position: relative;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .amount-modal-display:active {
+      transform: scale(0.99);
+      border-color: var(--blue);
+    }
+
+    .amount-modal-number {
+      font-size: 34px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.25;
+      word-break: break-all;
+      letter-spacing: -0.5px;
+      user-select: all;
+      padding: 4px 0;
+    }
+
+    .amount-modal-hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 10px;
+    }
+
+    .amount-modal-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .amount-modal-actions button {
+      flex: 1;
     }
 
     /* ===== SECTION HEADER (with Add button) ===== */
@@ -1116,6 +1201,18 @@
       align-items: center;
       justify-content: space-between;
       animation: fadeIn 0.3s ease;
+      cursor: pointer;
+      user-select: none;
+      transition: var(--transition);
+    }
+
+    .person-total-banner:hover {
+      border-color: var(--orange);
+    }
+
+    .person-total-banner:active {
+      transform: scale(0.98);
+      background: rgba(245, 158, 11, 0.2);
     }
 
     .person-total-banner .ptb-name {
@@ -1327,15 +1424,15 @@
         <button class="summary-toggle" id="toggleIncomeSummary" onclick="toggleSummary('income')"
           aria-label="Toggle summary">👁</button>
         <div class="summary-grid cols-3" id="incomeSummaryGrid">
-          <div class="summary-card green">
+          <div class="summary-card green" onclick="showAmountDetail('income')" title="Kattaroq ko'rish">
             <div class="summary-label" data-i18n="totalIncome">Umumiy Kirim</div>
             <div class="summary-value" id="totalIncome">0</div>
           </div>
-          <div class="summary-card red">
+          <div class="summary-card red" onclick="showAmountDetail('expense')" title="Kattaroq ko'rish">
             <div class="summary-label" data-i18n="totalExpense">Umumiy Chiqim</div>
             <div class="summary-value" id="totalExpense">0</div>
           </div>
-          <div class="summary-card blue">
+          <div class="summary-card blue" onclick="showAmountDetail('balance')" title="Kattaroq ko'rish">
             <div class="summary-label" data-i18n="balance">Balans</div>
             <div class="summary-value" id="balance">0</div>
           </div>
@@ -1358,18 +1455,18 @@
         <button class="summary-toggle" id="toggleDebtSummary" onclick="toggleSummary('debt')"
           aria-label="Toggle summary">👁</button>
         <div class="summary-grid cols-2" id="debtSummaryGrid">
-          <div class="summary-card orange">
+          <div class="summary-card orange" onclick="showAmountDetail('debts')" title="Kattaroq ko'rish">
             <div class="summary-label" data-i18n="totalDebts">Umumiy Qarzlar</div>
             <div class="summary-value" id="totalDebts">0</div>
           </div>
-          <div class="summary-card purple">
+          <div class="summary-card purple" onclick="showAmountDetail('returned')" title="Kattaroq ko'rish">
             <div class="summary-label" data-i18n="returned">Qaytarilgan</div>
             <div class="summary-value" id="totalReturned">0</div>
           </div>
         </div>
       </div>
       <div id="debtFilterChips" class="filter-chips"></div>
-      <div id="personTotalBanner" class="person-total-banner" style="display:none;">
+      <div id="personTotalBanner" class="person-total-banner" style="display:none;" onclick="showPersonTotalDetail()" title="Kattaroq ko'rish">
         <span class="ptb-name" id="ptbName"></span>
         <span class="ptb-amount" id="ptbAmount"></span>
       </div>
@@ -1390,7 +1487,7 @@
         <button class="summary-toggle" id="toggleExpectedSummary" onclick="toggleSummary('expected')"
           aria-label="Toggle summary">👁</button>
         <div class="summary-grid cols-1" id="expectedSummaryGrid">
-          <div class="summary-card blue">
+          <div class="summary-card blue" onclick="showAmountDetail('expected')" title="Kattaroq ko'rish">
             <div class="summary-label" data-i18n="totalExpected">Kutilayotgan Jami</div>
             <div class="summary-value" id="totalExpected">0</div>
           </div>
@@ -1554,6 +1651,29 @@
       <button type="button" class="btn-submit blue" onclick="promptAddSource()" data-i18n="addNewSource">＋ Yangi
         karta/manba qo'shish</button>
       <button type="button" class="btn-cancel" onclick="closeModal('modalSources')" data-i18n="cancel">Yopish</button>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: LARGE AMOUNT DETAIL ===== -->
+  <div class="modal-overlay" id="modalAmountDetail">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="amount-modal-box">
+        <div class="amount-modal-badge" id="amountModalBadge">
+          <span id="amountDetailIcon">💰</span>
+          <span id="amountDetailTitle">Balans</span>
+        </div>
+        <div class="amount-modal-display" id="amountModalDisplay" onclick="copyDetailAmount()" title="Nusxa olish uchun bosing">
+          <div class="amount-modal-number" id="amountDetailValue">0</div>
+          <div class="amount-modal-hint" id="amountModalHint" data-i18n="tapToCopyHint">Nusxa olish uchun bosing yoki quyidagi tugmadan foydalaning</div>
+        </div>
+        <div class="amount-modal-actions">
+          <button type="button" class="btn-submit blue" id="btnCopyAmount" onclick="copyDetailAmount()">
+            <span id="copyAmountText" data-i18n="copy">📋 Nusxa olish</span>
+          </button>
+          <button type="button" class="btn-cancel" style="margin-top:0;" onclick="closeModal('modalAmountDetail')" data-i18n="close">Yopish</button>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1898,6 +2018,11 @@
         enterPassword: 'Dasturga kirish uchun parolni kiriting',
         loginBtn: 'Kirish',
         wrongPassword: 'Parol noto\'g\'ri!',
+        copy: '📋 Nusxa olish',
+        copied: '✅ Nusxalandi!',
+        toastCopied: 'Raqam nusxalandi',
+        close: 'Yopish',
+        tapToCopyHint: 'Nusxa olish uchun bosing yoki quyidagi tugmadan foydalaning',
       },
       en: {
         headerTitle: '💰 Finance Tracker',
@@ -1966,6 +2091,11 @@
         enterPassword: 'Enter password to access app',
         loginBtn: 'Enter',
         wrongPassword: 'Wrong password!',
+        copy: '📋 Copy',
+        copied: '✅ Copied!',
+        toastCopied: 'Amount copied',
+        close: 'Close',
+        tapToCopyHint: 'Tap to copy or use the button below',
       }
     };
 
@@ -2086,15 +2216,153 @@
       if (id === 'modalIncome') { document.getElementById('formIncome').reset(); document.getElementById('incomeEditId').value = ''; }
       if (id === 'modalDebt') { document.getElementById('formDebt').reset(); document.getElementById('debtEditId').value = ''; }
       if (id === 'modalExpected') { document.getElementById('formExpected').reset(); document.getElementById('expectedEditId').value = ''; }
+      if (id === 'modalAmountDetail') {
+        const copyTxt = document.getElementById('copyAmountText');
+        if (copyTxt) copyTxt.textContent = t('copy');
+      }
       currentType = 'income';
       document.getElementById('typeBtnIncome').classList.add('active');
       document.getElementById('typeBtnExpense').classList.remove('active');
+    }
+
+    // =============================================
+    // LARGE AMOUNT DETAIL VIEW
+    // =============================================
+    let currentDetailRawValue = '0';
+
+    const DETAIL_CONFIG = {
+      income: { icon: '📈', labelKey: 'totalIncome', color: 'var(--green)', bgSoft: 'var(--green-soft)', border: 'rgba(34, 197, 94, 0.3)' },
+      expense: { icon: '📉', labelKey: 'totalExpense', color: 'var(--red)', bgSoft: 'var(--red-soft)', border: 'rgba(239, 68, 68, 0.3)' },
+      balance: { icon: '💳', labelKey: 'balance', dynamicColor: true, bgSoft: 'var(--blue-soft)', border: 'rgba(59, 130, 246, 0.3)' },
+      debts: { icon: '🤝', labelKey: 'totalDebts', color: 'var(--orange)', bgSoft: 'var(--orange-soft)', border: 'rgba(245, 158, 11, 0.3)' },
+      returned: { icon: '✅', labelKey: 'returned', color: 'var(--purple)', bgSoft: 'var(--purple-soft)', border: 'rgba(168, 85, 247, 0.3)' },
+      expected: { icon: '⏳', labelKey: 'totalExpected', color: 'var(--blue)', bgSoft: 'var(--blue-soft)', border: 'rgba(59, 130, 246, 0.3)' },
+    };
+
+    function showAmountDetail(type) {
+      const cfg = DETAIL_CONFIG[type];
+      if (!cfg) return;
+
+      const badgeEl = document.getElementById('amountModalBadge');
+      const iconEl = document.getElementById('amountDetailIcon');
+      const titleEl = document.getElementById('amountDetailTitle');
+      const valEl = document.getElementById('amountDetailValue');
+      const displayEl = document.getElementById('amountModalDisplay');
+
+      let valText = '0';
+      if (type === 'income') valText = document.getElementById('totalIncome').textContent;
+      else if (type === 'expense') valText = document.getElementById('totalExpense').textContent;
+      else if (type === 'balance') valText = document.getElementById('balance').textContent;
+      else if (type === 'debts') valText = document.getElementById('totalDebts').textContent;
+      else if (type === 'returned') valText = document.getElementById('totalReturned').textContent;
+      else if (type === 'expected') valText = document.getElementById('totalExpected').textContent;
+
+      let color = cfg.color;
+      let bgSoft = cfg.bgSoft;
+      let border = cfg.border;
+
+      if (cfg.dynamicColor) {
+        const isPos = !valText.startsWith('-');
+        color = isPos ? 'var(--green)' : 'var(--red)';
+        bgSoft = isPos ? 'var(--green-soft)' : 'var(--red-soft)';
+        border = isPos ? 'rgba(34, 197, 94, 0.3)' : 'rgba(239, 68, 68, 0.3)';
+      }
+
+      currentDetailRawValue = valText;
+      iconEl.textContent = cfg.icon;
+      titleEl.textContent = t(cfg.labelKey);
+      valEl.textContent = valText;
+      valEl.style.color = color;
+
+      badgeEl.style.background = bgSoft;
+      badgeEl.style.borderColor = border;
+      badgeEl.style.color = color;
+      displayEl.style.borderColor = border;
+
+      const copyTxt = document.getElementById('copyAmountText');
+      if (copyTxt) copyTxt.textContent = t('copy');
+
+      document.getElementById('modalAmountDetail').classList.add('active');
+    }
+
+    function showPersonTotalDetail() {
+      const badgeEl = document.getElementById('amountModalBadge');
+      const iconEl = document.getElementById('amountDetailIcon');
+      const titleEl = document.getElementById('amountDetailTitle');
+      const valEl = document.getElementById('amountDetailValue');
+      const displayEl = document.getElementById('amountModalDisplay');
+
+      const name = document.getElementById('ptbName').textContent;
+      const amount = document.getElementById('ptbAmount').textContent;
+
+      currentDetailRawValue = amount;
+      iconEl.textContent = '🤝';
+      titleEl.textContent = name;
+      valEl.textContent = amount;
+      valEl.style.color = 'var(--orange)';
+
+      badgeEl.style.background = 'var(--orange-soft)';
+      badgeEl.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+      badgeEl.style.color = 'var(--orange)';
+      displayEl.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+
+      const copyTxt = document.getElementById('copyAmountText');
+      if (copyTxt) copyTxt.textContent = t('copy');
+
+      document.getElementById('modalAmountDetail').classList.add('active');
+    }
+
+    function copyDetailAmount() {
+      if (!currentDetailRawValue) return;
+      const textToCopy = currentDetailRawValue.replace(/^[+]/, '').trim();
+      
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          showToast(t('toastCopied'));
+          const copyTxt = document.getElementById('copyAmountText');
+          if (copyTxt) copyTxt.textContent = t('copied');
+        }).catch(() => {
+          fallbackCopyText(textToCopy);
+        });
+      } else {
+        fallbackCopyText(textToCopy);
+      }
+    }
+
+    function fallbackCopyText(text) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        showToast(t('toastCopied'));
+        const copyTxt = document.getElementById('copyAmountText');
+        if (copyTxt) copyTxt.textContent = t('copied');
+      } catch (err) {
+        showToast(t('toastCopied'));
+      }
     }
 
     document.querySelectorAll('.modal-overlay').forEach(overlay => {
       overlay.addEventListener('click', (e) => {
         if (e.target === overlay) closeModal(overlay.id);
       });
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay.active').forEach(modal => {
+          closeModal(modal.id);
+        });
+        if (document.getElementById('confirmOverlay').classList.contains('active')) {
+          confirmCancel();
+        }
+      }
     });
 
     function setType(type) {
