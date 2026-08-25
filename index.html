@@ -2252,23 +2252,157 @@
 
     // =============================================
     // PAYMENT SOURCES & CARDS MANAGEMENT
+    // Firebase is the SOURCE OF TRUTH for cards/wallets.
+    // localStorage is only kept as a temporary offline/cache copy.
     // =============================================
-    function getSources() {
+    const DEFAULT_SOURCES = [
+      { id: 'cash', name: 'Naqd pul', type: 'cash', initialBalance: 0 },
+      { id: 'card1', name: 'Karta (Humo/Uzcard)', type: 'card', initialBalance: 0 }
+    ];
+
+    let cachedSources = null;
+    let sourcesFirebaseListenerAttached = false;
+
+    function getLocalSourcesCache() {
       try {
         const s = JSON.parse(localStorage.getItem('fin_sources'));
         if (Array.isArray(s) && s.length > 0) return s;
-      } catch { }
-      const defaults = [
-        { id: 'cash', name: 'Naqd pul', type: 'cash', initialBalance: 0 },
-        { id: 'card1', name: 'Karta (Humo/Uzcard)', type: 'card', initialBalance: 0 }
-      ];
-      localStorage.setItem('fin_sources', JSON.stringify(defaults));
-      return defaults;
+      } catch (_) {}
+      return null;
+    }
+
+    function normalizeSourcesArray(sources) {
+      if (!Array.isArray(sources)) return [];
+      return sources
+        .filter(Boolean)
+        .map(s => ({
+          id: String(s.id || generateId()),
+          name: String(s.name || 'Noma’lum'),
+          type: s.type === 'cash' ? 'cash' : 'card',
+          initialBalance: Number(s.initialBalance) || 0
+        }));
+    }
+
+    function sourcesArrayToFirebaseObject(sources) {
+      const obj = {};
+      normalizeSourcesArray(sources).forEach(s => {
+        obj[s.id] = {
+          name: s.name,
+          type: s.type,
+          initialBalance: s.initialBalance
+        };
+      });
+      return obj;
+    }
+
+    function firebaseObjectToSourcesArray(value) {
+      if (!value || typeof value !== 'object') return [];
+      return Object.keys(value).map(id => ({
+        id,
+        name: value[id]?.name || id,
+        type: value[id]?.type === 'cash' ? 'cash' : 'card',
+        initialBalance: Number(value[id]?.initialBalance) || 0
+      }));
+    }
+
+    function getSources() {
+      if (Array.isArray(cachedSources) && cachedSources.length > 0) {
+        return cachedSources;
+      }
+
+      const local = normalizeSourcesArray(getLocalSourcesCache());
+      if (local.length > 0) {
+        cachedSources = local;
+        return cachedSources;
+      }
+
+      cachedSources = DEFAULT_SOURCES.map(s => ({ ...s }));
+      localStorage.setItem('fin_sources', JSON.stringify(cachedSources));
+      return cachedSources;
     }
 
     function saveSources(sources) {
-      localStorage.setItem('fin_sources', JSON.stringify(sources));
-      recalculateAndRenderAll();
+      const normalized = normalizeSourcesArray(sources);
+      cachedSources = normalized.length > 0
+        ? normalized
+        : DEFAULT_SOURCES.map(s => ({ ...s }));
+
+      // localStorage is only a cache/offline fallback.
+      localStorage.setItem('fin_sources', JSON.stringify(cachedSources));
+
+      if (useFirebase && db) {
+        db.ref('sources').set(
+          sourcesArrayToFirebaseObject(cachedSources),
+          (error) => {
+            if (error) {
+              console.error('❌ Firebase sources save failed:', error);
+              showToast('Firebase xatosi: kartani saqlab bo‘lmadi');
+            } else {
+              console.log('✅ Sources saved to Firebase');
+            }
+          }
+        );
+      } else {
+        recalculateAndRenderAll();
+      }
+    }
+
+    function initializeSourcesFirebaseSync() {
+      if (!useFirebase || !db || sourcesFirebaseListenerAttached) return;
+
+      sourcesFirebaseListenerAttached = true;
+
+      const sourcesRef = db.ref('sources');
+
+      // Real-time listener: every device receives card/wallet changes.
+      sourcesRef.on('value', (snapshot) => {
+        const firebaseSources = firebaseObjectToSourcesArray(snapshot.val());
+
+        if (firebaseSources.length > 0) {
+          cachedSources = firebaseSources;
+          localStorage.setItem('fin_sources', JSON.stringify(cachedSources));
+
+          recalculateAndRenderAll();
+          renderSourcesList();
+          populateSourceSelects();
+
+          console.log('🔄 Sources synced from Firebase:', cachedSources);
+          return;
+        }
+
+        // Firebase has no sources yet. Migrate the old localStorage sources
+        // ONCE, so existing cards are not lost.
+        const localSources = normalizeSourcesArray(getLocalSourcesCache());
+
+        if (localSources.length > 0) {
+          const data = sourcesArrayToFirebaseObject(localSources);
+          sourcesRef.set(data, (error) => {
+            if (error) {
+              console.error('❌ Initial sources migration failed:', error);
+            } else {
+              console.log('✅ Existing local sources migrated to Firebase');
+            }
+          });
+        } else {
+          sourcesRef.set(
+            sourcesArrayToFirebaseObject(DEFAULT_SOURCES),
+            (error) => {
+              if (error) {
+                console.error('❌ Default sources creation failed:', error);
+              }
+            }
+          );
+        }
+      }, (error) => {
+        console.error('❌ Firebase sources listener failed:', error);
+        // Keep local cache usable if Firebase is temporarily unavailable.
+        cachedSources = normalizeSourcesArray(getLocalSourcesCache());
+        if (!cachedSources.length) {
+          cachedSources = DEFAULT_SOURCES.map(s => ({ ...s }));
+        }
+        recalculateAndRenderAll();
+        populateSourceSelects();
+      });
     }
 
     function isCashSource(id, name, type) {
@@ -2317,17 +2451,20 @@
 
       if (!name) return;
 
-      const sources = getSources();
+      const sources = [...getSources()];
       if (id) {
-        const s = sources.find(x => x.id === id);
-        if (s) {
-          s.name = name;
-          s.type = type;
-          s.initialBalance = initialBalance;
+        const index = sources.findIndex(x => x.id === id);
+        if (index !== -1) {
+          sources[index] = {
+            ...sources[index],
+            name,
+            type,
+            initialBalance
+          };
         }
         showToast(t('toastSourceUpdated'));
       } else {
-        const newId = 'src_' + Date.now().toString(36);
+        const newId = 'src_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
         sources.push({ id: newId, name, type, initialBalance });
         showToast(t('toastSourceAdded'));
       }
@@ -3826,6 +3963,11 @@
     }
 
     // =============================================
+    // REALTIME SOURCE / CARD SYNCHRONIZATION
+    // =============================================
+    initializeSourcesFirebaseSync();
+
+    // =============================================
     // REALTIME LISTENERS
     // =============================================
     store.on('entries', renderIncomeList);
@@ -3836,7 +3978,11 @@
     // INITIALIZATION
     // =============================================
     checkAuth();
+
+    // Render immediately from cache/defaults; Firebase listener will replace
+    // them with the shared cross-device source list as soon as it responds.
     populateSourceSelects();
+    recalculateAndRenderAll();
     applySummaryState();
     setLang(currentLang);
   </script>
