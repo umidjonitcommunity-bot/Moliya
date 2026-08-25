@@ -1265,9 +1265,21 @@
     }
 
     @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-10px); }
-      40%, 80% { transform: translateX(10px); }
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      20%,
+      60% {
+        transform: translateX(-10px);
+      }
+
+      40%,
+      80% {
+        transform: translateX(10px);
+      }
     }
 
     .shake {
@@ -1286,7 +1298,8 @@
       <p class="password-subtitle" data-i18n="enterPassword">Dasturga kirish uchun parolni kiriting</p>
       <form id="passwordForm" onsubmit="submitPassword(event)">
         <div class="password-input-group">
-          <input type="password" class="form-input" id="passwordInput" placeholder="••••" required autocomplete="current-password" inputmode="numeric">
+          <input type="password" class="form-input" id="passwordInput" placeholder="••••" required
+            autocomplete="current-password" inputmode="numeric">
           <div class="password-error" id="passwordError"></div>
         </div>
         <button type="submit" class="btn-submit green" id="passwordSubmitBtn" data-i18n="loginBtn">Kirish</button>
@@ -1742,6 +1755,21 @@
       document.getElementById('modalSources').classList.add('active');
     }
 
+    function isCashSource(id, name) {
+      const n = (name || '').toLowerCase();
+      const i = (id || '').toLowerCase();
+      return i === 'cash' || n.includes('naqd') || n.includes('naxt') || n.includes('cash') || n.includes('pul');
+    }
+
+    function getSourceBadge(id) {
+      if (!id) return '';
+      const sources = getSources();
+      const s = sources.find(x => x.id === id);
+      const name = s ? s.name : id;
+      const icon = isCashSource(id, name) ? '💵' : '💳';
+      return `<span class="entry-source">${icon} ${esc(name)}</span>`;
+    }
+
     function renderSourcesList() {
       const container = document.getElementById('sourcesListContainer');
       if (!container) return;
@@ -1751,8 +1779,9 @@
       sources.forEach(s => {
         const item = document.createElement('div');
         item.className = 'source-item';
+        const icon = isCashSource(s.id, s.name) ? '💵' : '💳';
         item.innerHTML = `
-          <div class="source-item-name">💳 ${esc(s.name)}</div>
+          <div class="source-item-name">${icon} ${esc(s.name)}</div>
           <div class="source-item-actions">
             <button class="btn-action edit" onclick="editSource('${s.id}')" title="Edit" aria-label="Edit source">✏️</button>
             <button class="btn-action delete" onclick="deleteSource('${s.id}')" title="Delete" aria-label="Delete source">🗑</button>
@@ -2237,7 +2266,7 @@
       balEl.style.color = bal >= 0 ? 'var(--green)' : 'var(--red)';
 
       entries.forEach(e => {
-        const srcName = e.source ? getSourceName(e.source) : '';
+        const srcBadge = getSourceBadge(e.source);
         const card = document.createElement('div');
         card.className = 'entry-card';
         card.innerHTML = `
@@ -2245,7 +2274,7 @@
           <div class="entry-info">
             <div class="entry-reason">${esc(e.reason)}</div>
             <div class="entry-meta">${formatDate(e.date)}</div>
-            ${srcName ? `<span class="entry-source">💳 ${esc(srcName)}</span>` : ''}
+            ${srcBadge}
           </div>
           <div class="entry-amount ${e.type}">${e.type === 'income' ? '+' : '-'}${formatNum(e.amount)}</div>
           <div class="entry-actions">
@@ -2399,7 +2428,7 @@
       document.getElementById('totalReturned').textContent = formatNum(totalRet);
 
       filtered.forEach(d => {
-        const srcName = d.source ? getSourceName(d.source) : '';
+        const srcBadge = getSourceBadge(d.source);
         const card = document.createElement('div');
         card.className = 'entry-card' + (d.returned ? ' returned-card' : '');
         card.innerHTML = `
@@ -2407,7 +2436,7 @@
           <div class="entry-info">
             <div class="entry-reason">${esc(d.name)}</div>
             <div class="entry-meta">${formatDate(d.date)} · ${esc(d.reason)}</div>
-            ${srcName ? `<span class="entry-source">💳 ${esc(srcName)}</span>` : ''}
+            ${srcBadge}
           </div>
           <div class="entry-amount debt">${formatNum(d.amount)}</div>
           <div class="entry-actions">
