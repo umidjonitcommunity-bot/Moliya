@@ -706,6 +706,11 @@
       background: var(--purple-soft);
     }
 
+    .entry-icon.transfer {
+      background: var(--purple-soft);
+      color: var(--purple);
+    }
+
     .entry-info {
       flex: 1;
       min-width: 0;
@@ -740,6 +745,26 @@
       color: var(--text-muted);
     }
 
+    .entry-source-transfer {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      padding: 2px 7px;
+      margin-top: 3px;
+      color: var(--text-secondary);
+      flex-wrap: wrap;
+    }
+
+    .entry-transfer-arrow {
+      color: var(--purple);
+      font-weight: 800;
+      margin: 0 2px;
+    }
+
     .entry-amount {
       font-size: 16px;
       font-weight: 700;
@@ -761,6 +786,62 @@
 
     .entry-amount.expected {
       color: var(--blue);
+    }
+
+    .entry-amount.transfer {
+      color: var(--purple);
+    }
+
+    .transfer-sources-box {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+
+    .btn-swap-sources {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      color: var(--purple);
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      flex-shrink: 0;
+      margin-bottom: 5px;
+    }
+
+    .btn-swap-sources:hover {
+      background: var(--purple-soft);
+      border-color: var(--purple);
+      transform: rotate(180deg);
+    }
+
+    .btn-swap-sources:active {
+      transform: scale(0.9) rotate(180deg);
+    }
+
+    .btn-text-action.purple-accent {
+      background: rgba(168, 85, 247, 0.12);
+      border-color: rgba(168, 85, 247, 0.3);
+      color: var(--purple);
+    }
+
+    .btn-text-action.purple-accent:hover {
+      background: rgba(168, 85, 247, 0.22);
+    }
+
+    .btn-submit.purple {
+      background: linear-gradient(135deg, var(--purple), #9333ea);
     }
 
     .entry-actions {
@@ -1768,17 +1849,29 @@
             <span data-i18n="cardsAndAccounts">Kartalar va Hamyonlar</span>
             <button type="button" class="btn-cards-toggle" id="toggleCardsSummary" onclick="toggleSummary('cards')" title="Yashirish / Ko'rsatish" aria-label="Toggle cards visibility">👁</button>
           </div>
-          <button type="button" class="btn-text-action" onclick="openSourcesModal()">
-            <span>⚙️</span>
-            <span data-i18n="manageSources">Boshqarish</span>
-          </button>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button type="button" class="btn-text-action purple-accent" onclick="openTransferModal()" title="Pul o'tkazish">
+              <span>🔄</span>
+              <span data-i18n="transfer">O'tkazma</span>
+            </button>
+            <button type="button" class="btn-text-action" onclick="openSourcesModal()">
+              <span>⚙️</span>
+              <span data-i18n="manageSources">Boshqarish</span>
+            </button>
+          </div>
         </div>
         <div class="cards-grid" id="cardsBarContainer"></div>
       </div>
 
       <div class="section-header">
         <h2 class="section-title" data-i18n="entries">Kirim-Chiqim Yozuvlari</h2>
-        <button class="btn-add green" onclick="openModal('income')" aria-label="Add entry">＋</button>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" class="btn-text-action purple-accent" style="padding: 8px 12px; font-size: 13px; border-radius: 12px;" onclick="openTransferModal()" title="Pul o'tkazish">
+            <span>🔄</span>
+            <span data-i18n="transfer">O'tkazma</span>
+          </button>
+          <button class="btn-add green" onclick="openModal('income')" aria-label="Add entry">＋</button>
+        </div>
       </div>
       <div class="entry-list" id="incomeList"></div>
       <div class="empty-state" id="incomeEmpty" style="display:none;">
@@ -2042,6 +2135,51 @@
         <button type="submit" class="btn-submit blue" id="expectedSubmitBtn" data-i18n="add">Qo'shish</button>
         <button type="button" class="btn-cancel" onclick="closeModal('modalExpected')" data-i18n="cancel">Bekor
           qilish</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: TRANSFER (PUL O'TKAZISH) ===== -->
+  <div class="modal-overlay" id="modalTransfer">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <h3 class="modal-title" id="modalTransferTitle" data-i18n="transferMoney">🔄 Pul o'tkazish</h3>
+      <form id="formTransfer" onsubmit="submitTransfer(event)">
+        <input type="hidden" id="transferEditId" value="">
+        
+        <div class="transfer-sources-box">
+          <div class="form-group" style="flex: 1; margin-bottom: 0;">
+            <label class="form-label" data-i18n="fromSource">Qayerdan (Chiqish)</label>
+            <select class="form-select" id="transferFromSource" required></select>
+          </div>
+          
+          <button type="button" class="btn-swap-sources" onclick="swapTransferSources()" title="Almashtirish" aria-label="Swap sources">
+            ⇄
+          </button>
+          
+          <div class="form-group" style="flex: 1; margin-bottom: 0;">
+            <label class="form-label" data-i18n="toSource">Qayerga (Qabul)</label>
+            <select class="form-select" id="transferToSource" required></select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" data-i18n="amount">Miqdor</label>
+          <input type="number" class="form-input" id="transferAmount" placeholder="0" min="0.01" step="any"
+            inputmode="decimal" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="date">Sana</label>
+          <input type="date" class="form-input" id="transferDate" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" data-i18n="reason">Izoh (ixtiyoriy)</label>
+          <input type="text" class="form-input" id="transferReason" data-placeholder="transferReasonPlaceholder"
+            placeholder="Masalan: Naqd pul kartaga, ATM...">
+        </div>
+        
+        <button type="submit" class="btn-submit purple" id="transferSubmitBtn" data-i18n="executeTransfer">🔄 O'tkazish</button>
+        <button type="button" class="btn-cancel" onclick="closeModal('modalTransfer')" data-i18n="cancel">Bekor qilish</button>
       </form>
     </div>
   </div>
@@ -2426,7 +2564,7 @@
 
     function populateSourceSelects() {
       const sources = getSources();
-      const selectIds = ['incomeSource', 'debtSource', 'debtPaymentSource', 'quickReturnSource'];
+      const selectIds = ['incomeSource', 'debtSource', 'debtPaymentSource', 'quickReturnSource', 'transferFromSource', 'transferToSource'];
       
       selectIds.forEach(selId => {
         const sel = document.getElementById(selId);
@@ -2443,7 +2581,11 @@
         if (currentVal && sources.some(s => s.id === currentVal)) {
           sel.value = currentVal;
         } else if (sources.length > 0) {
-          sel.value = sources[0].id;
+          if (selId === 'transferToSource' && sources.length > 1) {
+            sel.value = sources[1].id;
+          } else {
+            sel.value = sources[0].id;
+          }
         }
       });
     }
@@ -2465,32 +2607,78 @@
           expense: 0,
           debtGiven: 0,
           debtRepaid: 0,
+          transferIn: 0,
+          transferOut: 0,
           balance: s.initialBalance || 0
         };
       });
 
-      // 1. Incomes and Expenses
+      // 1. Incomes, Expenses, and Transfers
       cachedEntries.forEach(e => {
-        const srcId = e.source || (sources[0] ? sources[0].id : 'cash');
-        if (!statsMap[srcId]) {
-          statsMap[srcId] = {
-            id: srcId,
-            name: srcId,
-            type: isCashSource(srcId, srcId) ? 'cash' : 'card',
-            initialBalance: 0,
-            income: 0,
-            expense: 0,
-            debtGiven: 0,
-            debtRepaid: 0,
-            balance: 0
-          };
-        }
-        if (e.type === 'income') {
-          statsMap[srcId].income += e.amount;
-          statsMap[srcId].balance += e.amount;
+        if (e.type === 'transfer') {
+          const fromSrcId = e.fromSource || (sources[0] ? sources[0].id : 'cash');
+          const toSrcId = e.toSource || (sources[1] ? sources[1].id : 'card1');
+
+          if (!statsMap[fromSrcId]) {
+            statsMap[fromSrcId] = {
+              id: fromSrcId,
+              name: fromSrcId,
+              type: isCashSource(fromSrcId, fromSrcId) ? 'cash' : 'card',
+              initialBalance: 0,
+              income: 0,
+              expense: 0,
+              debtGiven: 0,
+              debtRepaid: 0,
+              transferIn: 0,
+              transferOut: 0,
+              balance: 0
+            };
+          }
+          if (!statsMap[toSrcId]) {
+            statsMap[toSrcId] = {
+              id: toSrcId,
+              name: toSrcId,
+              type: isCashSource(toSrcId, toSrcId) ? 'cash' : 'card',
+              initialBalance: 0,
+              income: 0,
+              expense: 0,
+              debtGiven: 0,
+              debtRepaid: 0,
+              transferIn: 0,
+              transferOut: 0,
+              balance: 0
+            };
+          }
+
+          statsMap[fromSrcId].transferOut = (statsMap[fromSrcId].transferOut || 0) + e.amount;
+          statsMap[fromSrcId].balance -= e.amount;
+
+          statsMap[toSrcId].transferIn = (statsMap[toSrcId].transferIn || 0) + e.amount;
+          statsMap[toSrcId].balance += e.amount;
         } else {
-          statsMap[srcId].expense += e.amount;
-          statsMap[srcId].balance -= e.amount;
+          const srcId = e.source || (sources[0] ? sources[0].id : 'cash');
+          if (!statsMap[srcId]) {
+            statsMap[srcId] = {
+              id: srcId,
+              name: srcId,
+              type: isCashSource(srcId, srcId) ? 'cash' : 'card',
+              initialBalance: 0,
+              income: 0,
+              expense: 0,
+              debtGiven: 0,
+              debtRepaid: 0,
+              transferIn: 0,
+              transferOut: 0,
+              balance: 0
+            };
+          }
+          if (e.type === 'income') {
+            statsMap[srcId].income += e.amount;
+            statsMap[srcId].balance += e.amount;
+          } else {
+            statsMap[srcId].expense += e.amount;
+            statsMap[srcId].balance -= e.amount;
+          }
         }
       });
 
@@ -2508,6 +2696,8 @@
             expense: 0,
             debtGiven: 0,
             debtRepaid: 0,
+            transferIn: 0,
+            transferOut: 0,
             balance: 0
           };
         }
@@ -2530,6 +2720,8 @@
                 expense: 0,
                 debtGiven: 0,
                 debtRepaid: 0,
+                transferIn: 0,
+                transferOut: 0,
                 balance: 0
               };
             }
@@ -2551,6 +2743,8 @@
               expense: 0,
               debtGiven: 0,
               debtRepaid: 0,
+              transferIn: 0,
+              transferOut: 0,
               balance: 0
             };
           }
@@ -2621,7 +2815,9 @@
           income: 0,
           expense: 0,
           debtGiven: 0,
-          debtRepaid: 0
+          debtRepaid: 0,
+          transferIn: 0,
+          transferOut: 0
         };
 
         const icon = stat.type === 'cash' ? '💵' : '💳';
@@ -2641,11 +2837,11 @@
           <div class="card-box-metrics">
             <div class="card-metric-row">
               <span data-i18n="inShort">Kir:</span>
-              <span class="card-metric-in">+${formatNum(stat.income)}</span>
+              <span class="card-metric-in">+${formatNum(stat.income + (stat.transferIn || 0))}</span>
             </div>
             <div class="card-metric-row">
               <span data-i18n="outShort">Chiq:</span>
-              <span class="card-metric-out">-${formatNum(stat.expense)}</span>
+              <span class="card-metric-out">-${formatNum(stat.expense + (stat.transferOut || 0))}</span>
             </div>
           </div>
         `;
@@ -2692,7 +2888,7 @@
       const { statsMap } = calculateSourceStats();
 
       sources.forEach(s => {
-        const stat = statsMap[s.id] || { balance: s.initialBalance || 0, income: 0, expense: 0, debtGiven: 0, debtRepaid: 0 };
+        const stat = statsMap[s.id] || { balance: s.initialBalance || 0, income: 0, expense: 0, debtGiven: 0, debtRepaid: 0, transferIn: 0, transferOut: 0 };
         const icon = isCashSource(s.id, s.name, s.type) ? '💵' : '💳';
         const balColor = stat.balance >= 0 ? 'var(--green)' : 'var(--red)';
 
@@ -2717,6 +2913,8 @@
             ${s.initialBalance ? `<span>Boshlang'ich: <b>${formatNum(s.initialBalance)}</b></span>` : ''}
             <span>Kirim: <b style="color:var(--green)">+${formatNum(stat.income)}</b></span>
             <span>Chiqim: <b style="color:var(--red)">-${formatNum(stat.expense)}</b></span>
+            ${stat.transferIn ? `<span>O'tkazib olingan: <b style="color:var(--teal)">+${formatNum(stat.transferIn)}</b></span>` : ''}
+            ${stat.transferOut ? `<span>O'tkazilgan: <b style="color:var(--purple)">-${formatNum(stat.transferOut)}</b></span>` : ''}
             <span>Berilgan qarz: <b style="color:var(--orange)">-${formatNum(stat.debtGiven)}</b></span>
             <span>Qaytarilgan: <b style="color:var(--purple)">+${formatNum(stat.debtRepaid)}</b></span>
           </div>
@@ -2829,6 +3027,15 @@
         toastCopied: 'Raqam nusxalandi',
         close: 'Yopish',
         tapToCopyHint: 'Nusxa olish uchun bosing yoki quyidagi tugmadan foydalaning',
+        transfer: "O'tkazma",
+        transferMoney: "🔄 Pul o'tkazish",
+        fromSource: "Qayerdan (Chiqish)",
+        toSource: "Qayerga (Qabul)",
+        executeTransfer: "🔄 O'tkazish",
+        editTransfer: "O'tkazmani tahrirlash",
+        transferReasonPlaceholder: "Masalan: Naqd pul kartaga, ATM...",
+        transferSameSourceError: "Chiqish va qabul manbasi bir xil bo'lmasligi kerak!",
+        transferSuccess: "O'tkazma muvaffaqiyatli saqlandi",
       },
       en: {
         headerTitle: '💰 Finance Tracker',
@@ -2930,6 +3137,15 @@
         toastCopied: 'Amount copied',
         close: 'Close',
         tapToCopyHint: 'Tap to copy or use the button below',
+        transfer: "Transfer",
+        transferMoney: "🔄 Transfer Money",
+        fromSource: "From (Source)",
+        toSource: "To (Destination)",
+        executeTransfer: "🔄 Transfer",
+        editTransfer: "Edit Transfer",
+        transferReasonPlaceholder: "e.g. Cash to card, ATM...",
+        transferSameSourceError: "Source and destination cannot be the same!",
+        transferSuccess: "Transfer saved successfully",
       }
     };
 
@@ -3083,6 +3299,7 @@
       if (id === 'modalIncome') { document.getElementById('formIncome').reset(); document.getElementById('incomeEditId').value = ''; }
       if (id === 'modalDebt') { document.getElementById('formDebt').reset(); document.getElementById('debtEditId').value = ''; }
       if (id === 'modalExpected') { document.getElementById('formExpected').reset(); document.getElementById('expectedEditId').value = ''; }
+      if (id === 'modalTransfer') { document.getElementById('formTransfer').reset(); document.getElementById('transferEditId').value = ''; }
       if (id === 'modalAmountDetail') {
         const copyTxt = document.getElementById('copyAmountText');
         if (copyTxt) copyTxt.textContent = t('copy');
@@ -3359,7 +3576,7 @@
       let totalIn = 0, totalOut = 0;
       cachedEntries.forEach(e => {
         if (e.type === 'income') totalIn += e.amount;
-        else totalOut += e.amount;
+        else if (e.type === 'expense') totalOut += e.amount;
       });
 
       document.getElementById('totalIncome').textContent = formatNum(totalIn);
@@ -3368,24 +3585,144 @@
       recalculateAndRenderAll();
 
       cachedEntries.forEach(e => {
-        const srcBadge = getSourceBadge(e.source);
         const card = document.createElement('div');
         card.className = 'entry-card';
-        card.innerHTML = `
-          <div class="entry-icon ${e.type}">${e.type === 'income' ? '📈' : '📉'}</div>
-          <div class="entry-info">
-            <div class="entry-reason">${esc(e.reason)}</div>
-            <div class="entry-meta">${formatDate(e.date)}</div>
-            ${srcBadge}
-          </div>
-          <div class="entry-amount ${e.type}">${e.type === 'income' ? '+' : '-'}${formatNum(e.amount)}</div>
-          <div class="entry-actions">
-            <button class="btn-action edit" onclick="editIncome('${e.id}')" aria-label="Edit">✏️</button>
-            <button class="btn-action delete" onclick="deleteIncome('${e.id}')" aria-label="Delete">🗑</button>
-          </div>
-        `;
+
+        if (e.type === 'transfer') {
+          const fromName = getSourceName(e.fromSource);
+          const toName = getSourceName(e.toSource);
+          const fromIcon = isCashSource(e.fromSource, fromName) ? '💵' : '💳';
+          const toIcon = isCashSource(e.toSource, toName) ? '💵' : '💳';
+          const defaultDesc = `${fromIcon} ${esc(fromName)} ➔ ${toIcon} ${esc(toName)}`;
+          const reasonHtml = e.reason ? `${esc(e.reason)} <span style="font-size:12px; color:var(--text-muted);">(${defaultDesc})</span>` : defaultDesc;
+
+          card.innerHTML = `
+            <div class="entry-icon transfer">🔄</div>
+            <div class="entry-info">
+              <div class="entry-reason">${reasonHtml}</div>
+              <div class="entry-meta">${formatDate(e.date)} · <span style="color:var(--purple); font-weight:600;">${t('transfer')}</span></div>
+              <div class="entry-source-transfer">
+                <span>${fromIcon} ${esc(fromName)}</span>
+                <span class="entry-transfer-arrow">➔</span>
+                <span>${toIcon} ${esc(toName)}</span>
+              </div>
+            </div>
+            <div class="entry-amount transfer">🔄 ${formatNum(e.amount)}</div>
+            <div class="entry-actions">
+              <button class="btn-action edit" onclick="editTransfer('${e.id}')" aria-label="Edit">✏️</button>
+              <button class="btn-action delete" onclick="deleteIncome('${e.id}')" aria-label="Delete">🗑</button>
+            </div>
+          `;
+        } else {
+          const srcBadge = getSourceBadge(e.source);
+          card.innerHTML = `
+            <div class="entry-icon ${e.type}">${e.type === 'income' ? '📈' : '📉'}</div>
+            <div class="entry-info">
+              <div class="entry-reason">${esc(e.reason)}</div>
+              <div class="entry-meta">${formatDate(e.date)}</div>
+              ${srcBadge}
+            </div>
+            <div class="entry-amount ${e.type}">${e.type === 'income' ? '+' : '-'}${formatNum(e.amount)}</div>
+            <div class="entry-actions">
+              <button class="btn-action edit" onclick="editIncome('${e.id}')" aria-label="Edit">✏️</button>
+              <button class="btn-action delete" onclick="deleteIncome('${e.id}')" aria-label="Delete">🗑</button>
+            </div>
+          `;
+        }
         list.appendChild(card);
       });
+    }
+
+    // =============================================
+    // TRANSFER LOGIC (PUL O'TKAZMALARI)
+    // =============================================
+    function openTransferModal(editData) {
+      const isEdit = !!editData;
+      const form = document.getElementById('formTransfer');
+      form.reset();
+      populateSourceSelects();
+
+      const sources = getSources();
+      document.getElementById('transferEditId').value = isEdit ? editData.id : '';
+      document.getElementById('transferDate').value = isEdit ? editData.date : todayStr();
+      document.getElementById('transferAmount').value = isEdit ? editData.amount : '';
+      document.getElementById('transferReason').value = isEdit ? (editData.reason || '') : '';
+
+      if (isEdit) {
+        if (editData.fromSource) document.getElementById('transferFromSource').value = editData.fromSource;
+        if (editData.toSource) document.getElementById('transferToSource').value = editData.toSource;
+      } else {
+        if (sources.length >= 2) {
+          document.getElementById('transferFromSource').value = sources[0].id;
+          document.getElementById('transferToSource').value = sources[1].id;
+        }
+      }
+
+      document.getElementById('modalTransferTitle').textContent = t(isEdit ? 'editTransfer' : 'transferMoney');
+      document.getElementById('transferSubmitBtn').textContent = t(isEdit ? 'save' : 'executeTransfer');
+      document.getElementById('modalTransfer').classList.add('active');
+    }
+
+    function swapTransferSources() {
+      const fromSel = document.getElementById('transferFromSource');
+      const toSel = document.getElementById('transferToSource');
+      const temp = fromSel.value;
+      fromSel.value = toSel.value;
+      toSel.value = temp;
+    }
+
+    function submitTransfer(e) {
+      e.preventDefault();
+      const editId = document.getElementById('transferEditId').value;
+      const fromSource = document.getElementById('transferFromSource').value;
+      const toSource = document.getElementById('transferToSource').value;
+      const amount = parseFloat(document.getElementById('transferAmount').value);
+      const date = document.getElementById('transferDate').value;
+      const reason = document.getElementById('transferReason').value.trim();
+
+      if (fromSource === toSource) {
+        showToast(t('transferSameSourceError'));
+        return;
+      }
+
+      if (!amount || amount <= 0) {
+        return;
+      }
+
+      const entry = {
+        type: 'transfer',
+        fromSource,
+        toSource,
+        amount,
+        date,
+        reason
+      };
+
+      if (editId) {
+        store.update('entries', editId, entry);
+        closeModal('modalTransfer');
+        showToast(t('toastUpdated'));
+      } else {
+        store.push('entries', entry);
+        closeModal('modalTransfer');
+        showToast(t('transferSuccess'));
+      }
+    }
+
+    function editTransfer(id) {
+      if (useFirebase) {
+        db.ref('entries/' + id).once('value', snap => {
+          if (!snap.exists()) return;
+          const data = { id, ...snap.val() };
+          openTransferModal(data);
+        });
+      } else {
+        const all = lsGetAll('entries');
+        const data = all[id];
+        if (!data) return;
+        data.id = id;
+        openTransferModal(data);
+      }
     }
 
     // =============================================
