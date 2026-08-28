@@ -1762,9 +1762,21 @@
     }
 
     @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-10px); }
-      40%, 80% { transform: translateX(10px); }
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      20%,
+      60% {
+        transform: translateX(-10px);
+      }
+
+      40%,
+      80% {
+        transform: translateX(10px);
+      }
     }
 
     .shake {
@@ -1811,7 +1823,7 @@
       <div class="summary-wrapper">
         <button class="summary-toggle" id="toggleIncomeSummary" onclick="toggleSummary('income')"
           aria-label="Toggle summary">👁</button>
-        
+
         <!-- Row 1: Grand Total, Cash Balance, Cards Balance -->
         <div class="summary-grid main-balances" id="incomeSummaryGrid">
           <div class="summary-card grand-total" onclick="showAmountDetail('grandTotal')" title="Kattaroq ko'rish">
@@ -1847,10 +1859,12 @@
           <div class="cards-section-title">
             <span>💳</span>
             <span data-i18n="cardsAndAccounts">Kartalar va Hamyonlar</span>
-            <button type="button" class="btn-cards-toggle" id="toggleCardsSummary" onclick="toggleSummary('cards')" title="Yashirish / Ko'rsatish" aria-label="Toggle cards visibility">👁</button>
+            <button type="button" class="btn-cards-toggle" id="toggleCardsSummary" onclick="toggleSummary('cards')"
+              title="Yashirish / Ko'rsatish" aria-label="Toggle cards visibility">👁</button>
           </div>
           <div style="display:flex; align-items:center; gap:6px;">
-            <button type="button" class="btn-text-action purple-accent" onclick="openTransferModal()" title="Pul o'tkazish">
+            <button type="button" class="btn-text-action purple-accent" onclick="openTransferModal()"
+              title="Pul o'tkazish">
               <span>🔄</span>
               <span data-i18n="transfer">O'tkazma</span>
             </button>
@@ -1866,7 +1880,9 @@
       <div class="section-header">
         <h2 class="section-title" data-i18n="entries">Kirim-Chiqim Yozuvlari</h2>
         <div style="display:flex; align-items:center; gap:8px;">
-          <button type="button" class="btn-text-action purple-accent" style="padding: 8px 12px; font-size: 13px; border-radius: 12px;" onclick="openTransferModal()" title="Pul o'tkazish">
+          <button type="button" class="btn-text-action purple-accent"
+            style="padding: 8px 12px; font-size: 13px; border-radius: 12px;" onclick="openTransferModal()"
+            title="Pul o'tkazish">
             <span>🔄</span>
             <span data-i18n="transfer">O'tkazma</span>
           </button>
@@ -1897,7 +1913,8 @@
         </div>
       </div>
       <div id="debtFilterChips" class="filter-chips"></div>
-      <div id="personTotalBanner" class="person-total-banner" style="display:none;" onclick="showPersonTotalDetail()" title="Kattaroq ko'rish">
+      <div id="personTotalBanner" class="person-total-banner" style="display:none;" onclick="showPersonTotalDetail()"
+        title="Kattaroq ko'rish">
         <span class="ptb-name" id="ptbName"></span>
         <span class="ptb-amount" id="ptbAmount"></span>
       </div>
@@ -2039,11 +2056,14 @@
           </div>
         </div>
         <div class="form-group">
-          <div class="form-checkbox-row" onclick="event.target.tagName !== 'INPUT' && (document.getElementById('debtAffectBalance').checked = !document.getElementById('debtAffectBalance').checked)">
+          <div class="form-checkbox-row"
+            onclick="event.target.tagName !== 'INPUT' && (document.getElementById('debtAffectBalance').checked = !document.getElementById('debtAffectBalance').checked)">
             <input type="checkbox" id="debtAffectBalance" checked>
             <label for="debtAffectBalance" data-i18n="debtAffectBalance">Karta/hisob balansidan ayirilsin</label>
           </div>
-          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;" data-i18n="debtAffectBalanceHint">Belgilansa, qarz berilganda kartadan ayiriladi. Qaytarilganda esa tanlangan karta/hisobga har doim qo'shiladi.</small>
+          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;"
+            data-i18n="debtAffectBalanceHint">Belgilansa, qarz berilganda kartadan ayiriladi. Qaytarilganda esa
+            tanlangan karta/hisobga har doim qo'shiladi.</small>
         </div>
         <button type="submit" class="btn-submit orange" id="debtSubmitBtn" data-i18n="add">Qo'shish</button>
         <button type="button" class="btn-cancel" onclick="closeModal('modalDebt')" data-i18n="cancel">Bekor
@@ -2057,7 +2077,8 @@
     <div class="modal">
       <div class="modal-handle"></div>
       <h3 class="modal-title" id="debtPaymentModalTitle" data-i18n="addDebtPayment">Qarz to'lovini qabul qilish</h3>
-      <div style="background:var(--bg-input); border-radius:var(--radius-sm); padding:12px 14px; margin-bottom:16px; border:1px solid var(--border);">
+      <div
+        style="background:var(--bg-input); border-radius:var(--radius-sm); padding:12px 14px; margin-bottom:16px; border:1px solid var(--border);">
         <div style="font-size:13px; color:var(--text-secondary); margin-bottom:4px;" id="debtPaymentPersonName"></div>
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <span style="font-size:13px; color:var(--text-muted);" data-i18n="remainingDebt">Qolgan qarz:</span>
@@ -2068,7 +2089,8 @@
         <input type="hidden" id="paymentDebtId" value="">
         <div class="form-group">
           <label class="form-label" data-i18n="paymentAmount">To'lov miqdori</label>
-          <input type="number" class="form-input" id="debtPaymentAmount" placeholder="0" min="0.01" step="any" inputmode="decimal" required>
+          <input type="number" class="form-input" id="debtPaymentAmount" placeholder="0" min="0.01" step="any"
+            inputmode="decimal" required>
         </div>
         <div class="form-group">
           <label class="form-label" data-i18n="paymentDate">To'lov sanasi</label>
@@ -2077,14 +2099,27 @@
         <div class="form-group">
           <label class="form-label" data-i18n="paymentReceivedTo">Qaysi kartaga / manbaga tushdi?</label>
           <select class="form-select" id="debtPaymentSource"></select>
-          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;" data-i18n="paymentSourceHint">Ushbu summa tanlangan karta balansiga qo'shiladi.</small>
+          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;"
+            data-i18n="paymentSourceHint">Ushbu summa tanlangan karta balansiga qo'shiladi.</small>
+        </div>
+        <div class="form-group">
+          <div class="form-checkbox-row"
+            onclick="event.target.tagName !== 'INPUT' && (document.getElementById('debtPaymentAffectBalance').checked = !document.getElementById('debtPaymentAffectBalance').checked)">
+            <input type="checkbox" id="debtPaymentAffectBalance" checked>
+            <label for="debtPaymentAffectBalance" data-i18n="debtPaymentAffectBalance">Karta/hisob balansiga qo'shilsin</label>
+          </div>
+          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;"
+            data-i18n="debtPaymentAffectBalanceHint">Belgilansa, to'lov summasi tanlangan karta balansiga qo'shiladi. Belgilanmasa, balans o'zgarmaydi.</small>
         </div>
         <div class="form-group">
           <label class="form-label" data-i18n="paymentNote">Izoh (ixtiyoriy)</label>
-          <input type="text" class="form-input" id="debtPaymentNote" data-placeholder="paymentNotePlaceholder" placeholder="Masalan: 1-qism to'lov...">
+          <input type="text" class="form-input" id="debtPaymentNote" data-placeholder="paymentNotePlaceholder"
+            placeholder="Masalan: 1-qism to'lov...">
         </div>
-        <button type="submit" class="btn-submit green" id="debtPaymentSubmitBtn" data-i18n="savePayment">To'lovni saqlash</button>
-        <button type="button" class="btn-cancel" onclick="closeModal('modalDebtPayment')" data-i18n="cancel">Bekor qilish</button>
+        <button type="submit" class="btn-submit green" id="debtPaymentSubmitBtn" data-i18n="savePayment">To'lovni
+          saqlash</button>
+        <button type="button" class="btn-cancel" onclick="closeModal('modalDebtPayment')" data-i18n="cancel">Bekor
+          qilish</button>
       </form>
     </div>
   </div>
@@ -2094,7 +2129,8 @@
     <div class="modal">
       <div class="modal-handle"></div>
       <h3 class="modal-title" data-i18n="confirmReturnTitle">Qarz qaytarilishini tasdiqlash</h3>
-      <div style="background:var(--bg-input); border-radius:var(--radius-sm); padding:14px; margin-bottom:16px; border:1px solid var(--border); text-align:center;">
+      <div
+        style="background:var(--bg-input); border-radius:var(--radius-sm); padding:14px; margin-bottom:16px; border:1px solid var(--border); text-align:center;">
         <div style="font-size:15px; font-weight:700; color:var(--text); margin-bottom:4px;" id="quickReturnName"></div>
         <div style="font-size:22px; font-weight:800; color:var(--green);" id="quickReturnAmount"></div>
       </div>
@@ -2103,10 +2139,22 @@
         <div class="form-group">
           <label class="form-label" data-i18n="paymentReceivedTo">Qaysi kartaga / manbaga tushdi?</label>
           <select class="form-select" id="quickReturnSource"></select>
-          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;" data-i18n="paymentSourceHint">Ushbu summa tanlangan karta balansiga qo'shiladi.</small>
+          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;"
+            data-i18n="paymentSourceHint">Ushbu summa tanlangan karta balansiga qo'shiladi.</small>
         </div>
-        <button type="submit" class="btn-submit green" data-i18n="confirmFullReturn">To'liq qaytarildi deb saqlash</button>
-        <button type="button" class="btn-cancel" onclick="closeModal('modalReturnDebt')" data-i18n="cancel">Bekor qilish</button>
+        <div class="form-group">
+          <div class="form-checkbox-row"
+            onclick="event.target.tagName !== 'INPUT' && (document.getElementById('quickReturnAffectBalance').checked = !document.getElementById('quickReturnAffectBalance').checked)">
+            <input type="checkbox" id="quickReturnAffectBalance" checked>
+            <label for="quickReturnAffectBalance" data-i18n="debtPaymentAffectBalance">Karta/hisob balansiga qo'shilsin</label>
+          </div>
+          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;"
+            data-i18n="debtPaymentAffectBalanceHint">Belgilansa, to'lov summasi tanlangan karta balansiga qo'shiladi. Belgilanmasa, balans o'zgarmaydi.</small>
+        </div>
+        <button type="submit" class="btn-submit green" data-i18n="confirmFullReturn">To'liq qaytarildi deb
+          saqlash</button>
+        <button type="button" class="btn-cancel" onclick="closeModal('modalReturnDebt')" data-i18n="cancel">Bekor
+          qilish</button>
       </form>
     </div>
   </div>
@@ -2146,17 +2194,18 @@
       <h3 class="modal-title" id="modalTransferTitle" data-i18n="transferMoney">🔄 Pul o'tkazish</h3>
       <form id="formTransfer" onsubmit="submitTransfer(event)">
         <input type="hidden" id="transferEditId" value="">
-        
+
         <div class="transfer-sources-box">
           <div class="form-group" style="flex: 1; margin-bottom: 0;">
             <label class="form-label" data-i18n="fromSource">Qayerdan (Chiqish)</label>
             <select class="form-select" id="transferFromSource" required></select>
           </div>
-          
-          <button type="button" class="btn-swap-sources" onclick="swapTransferSources()" title="Almashtirish" aria-label="Swap sources">
+
+          <button type="button" class="btn-swap-sources" onclick="swapTransferSources()" title="Almashtirish"
+            aria-label="Swap sources">
             ⇄
           </button>
-          
+
           <div class="form-group" style="flex: 1; margin-bottom: 0;">
             <label class="form-label" data-i18n="toSource">Qayerga (Qabul)</label>
             <select class="form-select" id="transferToSource" required></select>
@@ -2177,9 +2226,11 @@
           <input type="text" class="form-input" id="transferReason" data-placeholder="transferReasonPlaceholder"
             placeholder="Masalan: Naqd pul kartaga, ATM...">
         </div>
-        
-        <button type="submit" class="btn-submit purple" id="transferSubmitBtn" data-i18n="executeTransfer">🔄 O'tkazish</button>
-        <button type="button" class="btn-cancel" onclick="closeModal('modalTransfer')" data-i18n="cancel">Bekor qilish</button>
+
+        <button type="submit" class="btn-submit purple" id="transferSubmitBtn" data-i18n="executeTransfer">🔄
+          O'tkazish</button>
+        <button type="button" class="btn-cancel" onclick="closeModal('modalTransfer')" data-i18n="cancel">Bekor
+          qilish</button>
       </form>
     </div>
   </div>
@@ -2205,12 +2256,14 @@
         <input type="hidden" id="sourceEditId" value="">
         <div class="form-group">
           <label class="form-label" data-i18n="sourceName">Karta / Manba nomi</label>
-          <input type="text" class="form-input" id="sourceEditName" data-placeholder="addSourcePlaceholder" placeholder="Masalan: Humo karta, Uzcard, Naqd..." required>
+          <input type="text" class="form-input" id="sourceEditName" data-placeholder="addSourcePlaceholder"
+            placeholder="Masalan: Humo karta, Uzcard, Naqd..." required>
         </div>
         <div class="form-group">
           <label class="form-label" data-i18n="sourceType">Turi</label>
           <div class="type-toggle">
-            <button type="button" class="type-btn card-btn active" id="sourceTypeCardBtn" onclick="setSourceType('card')">
+            <button type="button" class="type-btn card-btn active" id="sourceTypeCardBtn"
+              onclick="setSourceType('card')">
               <span>💳 Karta</span>
             </button>
             <button type="button" class="type-btn cash-btn" id="sourceTypeCashBtn" onclick="setSourceType('cash')">
@@ -2221,10 +2274,12 @@
         <div class="form-group">
           <label class="form-label" data-i18n="initialBalance">Boshlang'ich Balans</label>
           <input type="number" class="form-input" id="sourceEditInitial" placeholder="0" step="any" inputmode="decimal">
-          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;" data-i18n="initialBalanceHint">Kartada dastlab mavjud bo'lgan pul miqdori.</small>
+          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;"
+            data-i18n="initialBalanceHint">Kartada dastlab mavjud bo'lgan pul miqdori.</small>
         </div>
         <button type="submit" class="btn-submit blue" id="sourceEditSubmitBtn" data-i18n="save">Saqlash</button>
-        <button type="button" class="btn-cancel" onclick="closeModal('modalSourceEdit')" data-i18n="cancel">Bekor qilish</button>
+        <button type="button" class="btn-cancel" onclick="closeModal('modalSourceEdit')" data-i18n="cancel">Bekor
+          qilish</button>
       </form>
     </div>
   </div>
@@ -2238,15 +2293,18 @@
           <span id="amountDetailIcon">💰</span>
           <span id="amountDetailTitle">Balans</span>
         </div>
-        <div class="amount-modal-display" id="amountModalDisplay" onclick="copyDetailAmount()" title="Nusxa olish uchun bosing">
+        <div class="amount-modal-display" id="amountModalDisplay" onclick="copyDetailAmount()"
+          title="Nusxa olish uchun bosing">
           <div class="amount-modal-number" id="amountDetailValue">0</div>
-          <div class="amount-modal-hint" id="amountModalHint" data-i18n="tapToCopyHint">Nusxa olish uchun bosing yoki quyidagi tugmadan foydalaning</div>
+          <div class="amount-modal-hint" id="amountModalHint" data-i18n="tapToCopyHint">Nusxa olish uchun bosing yoki
+            quyidagi tugmadan foydalaning</div>
         </div>
         <div class="amount-modal-actions">
           <button type="button" class="btn-submit blue" id="btnCopyAmount" onclick="copyDetailAmount()">
             <span id="copyAmountText" data-i18n="copy">📋 Nusxa olish</span>
           </button>
-          <button type="button" class="btn-cancel" style="margin-top:0;" onclick="closeModal('modalAmountDetail')" data-i18n="close">Yopish</button>
+          <button type="button" class="btn-cancel" style="margin-top:0;" onclick="closeModal('modalAmountDetail')"
+            data-i18n="close">Yopish</button>
         </div>
       </div>
     </div>
@@ -2565,7 +2623,7 @@
     function populateSourceSelects() {
       const sources = getSources();
       const selectIds = ['incomeSource', 'debtSource', 'debtPaymentSource', 'quickReturnSource', 'transferFromSource', 'transferToSource'];
-      
+
       selectIds.forEach(selId => {
         const sel = document.getElementById(selId);
         if (!sel) return;
@@ -2706,9 +2764,10 @@
           statsMap[givenSrcId].balance -= d.amount;
         }
 
-        // 3. Debts Repaid (Partial and Full payments added to receiving source - always added to the selected balance)
+        // 3. Debts Repaid (Partial and Full payments added to receiving source, if affectBalance !== false)
         if (d.payments && Array.isArray(d.payments) && d.payments.length > 0) {
           d.payments.forEach(p => {
+            const pAffect = p.affectBalance !== false; // default is true
             const pSrcId = p.source || givenSrcId;
             if (!statsMap[pSrcId]) {
               statsMap[pSrcId] = {
@@ -2725,11 +2784,14 @@
                 balance: 0
               };
             }
-            statsMap[pSrcId].debtRepaid += (p.amount || 0);
-            statsMap[pSrcId].balance += (p.amount || 0);
+            if (pAffect) {
+              statsMap[pSrcId].debtRepaid += (p.amount || 0);
+              statsMap[pSrcId].balance += (p.amount || 0);
+            }
           });
         } else if (d.returned) {
           // Legacy full return without payments array
+          const retAffect = d.returnAffectBalance !== false;
           const retSrcId = d.returnSource || givenSrcId;
           if (!statsMap[retSrcId]) {
             statsMap[retSrcId] = {
@@ -2746,8 +2808,10 @@
               balance: 0
             };
           }
-          statsMap[retSrcId].debtRepaid += d.amount;
-          statsMap[retSrcId].balance += d.amount;
+          if (retAffect) {
+            statsMap[retSrcId].debtRepaid += d.amount;
+            statsMap[retSrcId].balance += d.amount;
+          }
         }
       });
 
@@ -2997,6 +3061,8 @@
         paymentDate: 'To\'lov sanasi',
         paymentReceivedTo: 'Qaysi kartaga / manbaga tushdi?',
         paymentSourceHint: 'Ushbu summa tanlangan karta balansiga qo\'shiladi.',
+        debtPaymentAffectBalance: 'Karta/hisob balansiga qo\'shilsin',
+        debtPaymentAffectBalanceHint: 'Belgilansa, to\'lov summasi tanlangan karta balansiga qo\'shiladi. Belgilanmasa, balans o\'zgarmaydi.',
         paymentNote: 'Izoh (ixtiyoriy)',
         paymentNotePlaceholder: 'Masalan: 1-qism to\'lov...',
         savePayment: 'To\'lovni saqlash',
@@ -3107,6 +3173,8 @@
         paymentDate: 'Payment date',
         paymentReceivedTo: 'Received to which card / source?',
         paymentSourceHint: 'This amount will be added to the selected card balance.',
+        debtPaymentAffectBalance: 'Add to card/account balance',
+        debtPaymentAffectBalanceHint: 'If checked, the payment amount will be added to the selected card balance. If unchecked, balance is unaffected.',
         paymentNote: 'Note (optional)',
         paymentNotePlaceholder: 'e.g. 1st installment...',
         savePayment: 'Save Payment',
@@ -3388,7 +3456,7 @@
     function copyDetailAmount() {
       if (!currentDetailRawValue) return;
       const textToCopy = currentDetailRawValue.replace(/^[+]/, '').trim();
-      
+
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(textToCopy).then(() => {
           showToast(t('toastCopied'));
@@ -3777,14 +3845,16 @@
       if (!debt) return;
 
       const { paidAmount, remainingAmount } = getDebtProgress(debt);
-      
+
       document.getElementById('formDebtPayment').reset();
       document.getElementById('paymentDebtId').value = debt.id;
       document.getElementById('debtPaymentPersonName').textContent = `${esc(debt.name)} · ${esc(debt.reason)}`;
       document.getElementById('debtPaymentRemainingVal').textContent = formatNum(remainingAmount);
       document.getElementById('debtPaymentAmount').value = remainingAmount;
       document.getElementById('debtPaymentDate').value = todayStr();
-      
+      const affectEl = document.getElementById('debtPaymentAffectBalance');
+      if (affectEl) affectEl.checked = true;
+
       populateSourceSelects();
       if (debt.source) {
         const sel = document.getElementById('debtPaymentSource');
@@ -3802,6 +3872,7 @@
       const date = document.getElementById('debtPaymentDate').value;
       const source = document.getElementById('debtPaymentSource').value;
       const note = document.getElementById('debtPaymentNote').value.trim();
+      const affectBalance = document.getElementById('debtPaymentAffectBalance') ? document.getElementById('debtPaymentAffectBalance').checked : true;
 
       const debt = cachedDebts.find(d => d.id === debtId);
       if (!debt || !amount || amount <= 0) return;
@@ -3813,6 +3884,7 @@
         date: date,
         source: source,
         note: note,
+        affectBalance: affectBalance,
         createdAt: Date.now()
       };
       payments.push(newPayment);
@@ -3856,7 +3928,9 @@
       document.getElementById('quickReturnDebtId').value = debt.id;
       document.getElementById('quickReturnName').textContent = debt.name;
       document.getElementById('quickReturnAmount').textContent = formatNum(remainingAmount);
-      
+      const affectEl = document.getElementById('quickReturnAffectBalance');
+      if (affectEl) affectEl.checked = true;
+
       populateSourceSelects();
       if (debt.source) {
         const sel = document.getElementById('quickReturnSource');
@@ -3871,6 +3945,7 @@
       e.preventDefault();
       const debtId = document.getElementById('quickReturnDebtId').value;
       const source = document.getElementById('quickReturnSource').value;
+      const affectBalance = document.getElementById('quickReturnAffectBalance') ? document.getElementById('quickReturnAffectBalance').checked : true;
       const debt = cachedDebts.find(d => d.id === debtId);
       if (!debt) return;
 
@@ -3884,6 +3959,7 @@
           date: todayStr(),
           source: source,
           note: currentLang === 'uz' ? "To'liq yopildi" : "Fully closed",
+          affectBalance: affectBalance,
           createdAt: Date.now()
         });
       }
@@ -3891,6 +3967,7 @@
       store.update('debts', debtId, {
         payments: payments,
         returnSource: source,
+        returnAffectBalance: affectBalance,
         returned: true,
         returnedAt: 'SERVER_TIMESTAMP'
       });
@@ -4021,6 +4098,7 @@
                   <div class="debt-payment-info">
                     <span>📅 ${formatDate(p.date)}</span>
                     ${getSourceBadge(p.source)}
+                    ${p.affectBalance === false ? `<span class="entry-source" style="background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.25); font-size:11px;">🚫 ${t('noBalanceImpact')}</span>` : ''}
                     ${p.note ? `<span style="color:var(--text-muted);">(${esc(p.note)})</span>` : ''}
                   </div>
                   <div style="display:flex; align-items:center; gap:8px;">
