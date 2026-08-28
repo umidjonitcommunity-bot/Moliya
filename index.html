@@ -2043,7 +2043,7 @@
             <input type="checkbox" id="debtAffectBalance" checked>
             <label for="debtAffectBalance" data-i18n="debtAffectBalance">Karta/hisob balansidan ayirilsin</label>
           </div>
-          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;" data-i18n="debtAffectBalanceHint">Belgilansa, qarz summasi kartadan ayriladi va qaytarilganda kartaga qo'shiladi.</small>
+          <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;" data-i18n="debtAffectBalanceHint">Belgilansa, qarz berilganda kartadan ayiriladi. Qaytarilganda esa tanlangan karta/hisobga har doim qo'shiladi.</small>
         </div>
         <button type="submit" class="btn-submit orange" id="debtSubmitBtn" data-i18n="add">Qo'shish</button>
         <button type="button" class="btn-cancel" onclick="closeModal('modalDebt')" data-i18n="cancel">Bekor
@@ -2706,7 +2706,7 @@
           statsMap[givenSrcId].balance -= d.amount;
         }
 
-        // 3. Debts Repaid (Partial and Full payments added to receiving source, if affectBalance !== false)
+        // 3. Debts Repaid (Partial and Full payments added to receiving source - always added to the selected balance)
         if (d.payments && Array.isArray(d.payments) && d.payments.length > 0) {
           d.payments.forEach(p => {
             const pSrcId = p.source || givenSrcId;
@@ -2725,10 +2725,8 @@
                 balance: 0
               };
             }
-            if (affect) {
-              statsMap[pSrcId].debtRepaid += (p.amount || 0);
-              statsMap[pSrcId].balance += (p.amount || 0);
-            }
+            statsMap[pSrcId].debtRepaid += (p.amount || 0);
+            statsMap[pSrcId].balance += (p.amount || 0);
           });
         } else if (d.returned) {
           // Legacy full return without payments array
@@ -2748,10 +2746,8 @@
               balance: 0
             };
           }
-          if (affect) {
-            statsMap[retSrcId].debtRepaid += d.amount;
-            statsMap[retSrcId].balance += d.amount;
-          }
+          statsMap[retSrcId].debtRepaid += d.amount;
+          statsMap[retSrcId].balance += d.amount;
         }
       });
 
@@ -2993,8 +2989,8 @@
         debtGivenFromSource: 'Qaysi kartadan/manbadan berildi?',
         debtSourceHint: 'Ushbu summa tanlangan karta balansidan ayriladi.',
         debtAffectBalance: 'Karta/hisob balansidan ayirilsin',
-        debtAffectBalanceHint: 'Belgilansa, qarz summasi kartadan ayriladi va qaytarilganda kartaga qo\'shiladi.',
-        noBalanceImpact: 'Balansga ta\'sirsiz',
+        debtAffectBalanceHint: 'Belgilansa, qarz berilganda kartadan ayiriladi. Qaytarilganda esa tanlangan karta/hisobga har doim qo\'shiladi.',
+        noBalanceImpact: 'Balansdan ayirilmagan',
         addDebtPayment: 'Qarz to\'lovini qabul qilish',
         remainingDebt: 'Qolgan qarz:',
         paymentAmount: 'To\'lov miqdori',
@@ -3103,8 +3099,8 @@
         debtGivenFromSource: 'Given from which card/source?',
         debtSourceHint: 'This amount will be deducted from the selected card balance.',
         debtAffectBalance: 'Deduct from card/account balance',
-        debtAffectBalanceHint: 'If checked, debt will deduct from balance and return will add to balance.',
-        noBalanceImpact: 'No balance impact',
+        debtAffectBalanceHint: 'If checked, debt is deducted from balance when given. Repayments will always be added to the chosen balance.',
+        noBalanceImpact: 'Not deducted from balance',
         addDebtPayment: 'Accept Debt Payment',
         remainingDebt: 'Remaining debt:',
         paymentAmount: 'Payment amount',
@@ -3790,6 +3786,12 @@
       document.getElementById('debtPaymentDate').value = todayStr();
       
       populateSourceSelects();
+      if (debt.source) {
+        const sel = document.getElementById('debtPaymentSource');
+        if (sel && Array.from(sel.options).some(o => o.value === debt.source)) {
+          sel.value = debt.source;
+        }
+      }
       document.getElementById('modalDebtPayment').classList.add('active');
     }
 
@@ -3856,6 +3858,12 @@
       document.getElementById('quickReturnAmount').textContent = formatNum(remainingAmount);
       
       populateSourceSelects();
+      if (debt.source) {
+        const sel = document.getElementById('quickReturnSource');
+        if (sel && Array.from(sel.options).some(o => o.value === debt.source)) {
+          sel.value = debt.source;
+        }
+      }
       document.getElementById('modalReturnDebt').classList.add('active');
     }
 
