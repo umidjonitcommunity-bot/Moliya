@@ -1782,6 +1782,96 @@
     .shake {
       animation: shake 0.4s ease-in-out;
     }
+
+    /* ===== DATE FILTER BAR ===== */
+    .date-filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding: 12px 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      flex-wrap: wrap;
+    }
+
+    .date-filter-bar .form-input {
+      height: 40px;
+      font-size: 14px;
+      flex: 1;
+      min-width: 110px;
+    }
+
+    .date-filter-bar .filter-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .btn-filter-clear {
+      height: 40px;
+      padding: 0 14px;
+      border-radius: var(--radius-xs);
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      color: var(--text-secondary);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+      font-family: inherit;
+    }
+
+    .btn-filter-clear:active {
+      background: var(--bg-card-hover);
+      color: var(--text);
+    }
+
+    /* ===== DUE DATE BADGE ===== */
+    .due-date-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-top: 3px;
+    }
+
+    .due-date-badge.upcoming {
+      background: rgba(59, 130, 246, 0.12);
+      color: var(--blue);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+    }
+
+    .due-date-badge.today {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--orange);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      animation: pulse-glow 2s infinite;
+    }
+
+    .due-date-badge.overdue {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      animation: pulse-glow 2s infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .nav-item.active.tab-expense::before {
+      background: var(--red);
+    }
   </style>
 </head>
 
@@ -1840,15 +1930,11 @@
           </div>
         </div>
 
-        <!-- Row 2: Total Income, Total Expense -->
-        <div class="summary-grid income-expense-row" id="incomeExpenseGrid">
+        <!-- Row 2: Total Income -->
+        <div class="summary-grid cols-1" id="incomeExpenseGrid">
           <div class="summary-card green" onclick="showAmountDetail('income')" title="Kattaroq ko'rish">
-            <div class="summary-label" data-i18n="totalIncome">📈 Kirim</div>
+            <div class="summary-label" data-i18n="totalIncome">📈 Umumiy Kirim</div>
             <div class="summary-value" id="totalIncome">0</div>
-          </div>
-          <div class="summary-card red" onclick="showAmountDetail('expense')" title="Kattaroq ko'rish">
-            <div class="summary-label" data-i18n="totalExpense">📉 Chiqim</div>
-            <div class="summary-value" id="totalExpense">0</div>
           </div>
         </div>
       </div>
@@ -1877,8 +1963,17 @@
         <div class="cards-grid" id="cardsBarContainer"></div>
       </div>
 
+      <!-- Date Filter for Income -->
+      <div class="date-filter-bar" id="incomeFilterBar">
+        <span class="filter-label" data-i18n="filterPeriod">📅 Davr:</span>
+        <input type="date" class="form-input" id="incomeFilterFrom" onchange="applyIncomeFilter()">
+        <span class="filter-label">—</span>
+        <input type="date" class="form-input" id="incomeFilterTo" onchange="applyIncomeFilter()">
+        <button type="button" class="btn-filter-clear" onclick="clearIncomeFilter()" data-i18n="clearFilter">Tozalash</button>
+      </div>
+
       <div class="section-header">
-        <h2 class="section-title" data-i18n="entries">Kirim-Chiqim Yozuvlari</h2>
+        <h2 class="section-title" data-i18n="incomeEntries">Kirimlar</h2>
         <div style="display:flex; align-items:center; gap:8px;">
           <button type="button" class="btn-text-action purple-accent"
             style="padding: 8px 12px; font-size: 13px; border-radius: 12px;" onclick="openTransferModal()"
@@ -1886,13 +1981,44 @@
             <span>🔄</span>
             <span data-i18n="transfer">O'tkazma</span>
           </button>
-          <button class="btn-add green" onclick="openModal('income')" aria-label="Add entry">＋</button>
+          <button class="btn-add green" onclick="openModal('income')" aria-label="Add income">＋</button>
         </div>
       </div>
       <div class="entry-list" id="incomeList"></div>
       <div class="empty-state" id="incomeEmpty" style="display:none;">
-        <div class="empty-icon">📄</div>
-        <div class="empty-text" data-i18n="noEntries">Hali yozuvlar yo'q</div>
+        <div class="empty-icon">📈</div>
+        <div class="empty-text" data-i18n="noIncomeEntries">Hali kirim yozuvlari yo'q</div>
+      </div>
+    </section>
+
+    <!-- ===== TAB: EXPENSES ===== -->
+    <section class="tab-content" id="tabExpense">
+      <div class="summary-wrapper">
+        <div class="summary-grid cols-1">
+          <div class="summary-card red" onclick="showAmountDetail('expense')" title="Kattaroq ko'rish">
+            <div class="summary-label" data-i18n="totalExpense">📉 Umumiy Chiqim</div>
+            <div class="summary-value" id="totalExpense">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Date Filter for Expenses -->
+      <div class="date-filter-bar" id="expenseFilterBar">
+        <span class="filter-label" data-i18n="filterPeriod">📅 Davr:</span>
+        <input type="date" class="form-input" id="expenseFilterFrom" onchange="applyExpenseFilter()">
+        <span class="filter-label">—</span>
+        <input type="date" class="form-input" id="expenseFilterTo" onchange="applyExpenseFilter()">
+        <button type="button" class="btn-filter-clear" onclick="clearExpenseFilter()" data-i18n="clearFilter">Tozalash</button>
+      </div>
+
+      <div class="section-header">
+        <h2 class="section-title" data-i18n="expenseEntries">Chiqimlar</h2>
+        <button class="btn-add green" style="background:var(--red); box-shadow:0 4px 16px var(--red-glow);" onclick="openModal('income'); setTimeout(()=>setType('expense'),50)" aria-label="Add expense">＋</button>
+      </div>
+      <div class="entry-list" id="expenseList"></div>
+      <div class="empty-state" id="expenseEmpty" style="display:none;">
+        <div class="empty-icon">📉</div>
+        <div class="empty-text" data-i18n="noExpenseEntries">Hali chiqim yozuvlari yo'q</div>
       </div>
     </section>
 
@@ -1911,6 +2037,14 @@
             <div class="summary-value" id="totalReturned">0</div>
           </div>
         </div>
+      </div>
+      <!-- Date Filter for Debts -->
+      <div class="date-filter-bar" id="debtFilterBar">
+        <span class="filter-label" data-i18n="filterPeriod">📅 Davr:</span>
+        <input type="date" class="form-input" id="debtFilterFrom" onchange="applyDebtFilter()">
+        <span class="filter-label">—</span>
+        <input type="date" class="form-input" id="debtFilterTo" onchange="applyDebtFilter()">
+        <button type="button" class="btn-filter-clear" onclick="clearDebtFilter()" data-i18n="clearFilter">Tozalash</button>
       </div>
       <div id="debtFilterChips" class="filter-chips"></div>
       <div id="personTotalBanner" class="person-total-banner" style="display:none;" onclick="showPersonTotalDetail()"
@@ -1957,8 +2091,12 @@
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav" id="bottomNav">
     <button class="nav-item active tab-income" data-tab="tabIncome" onclick="switchTab('tabIncome', this)">
-      <span class="nav-icon">💰</span>
-      <span class="nav-label" data-i18n="navIncome">Kirim-Chiqim</span>
+      <span class="nav-icon">📈</span>
+      <span class="nav-label" data-i18n="navIncomeOnly">Kirimlar</span>
+    </button>
+    <button class="nav-item tab-expense" data-tab="tabExpense" onclick="switchTab('tabExpense', this)">
+      <span class="nav-icon">📉</span>
+      <span class="nav-label" data-i18n="navExpenseOnly">Chiqimlar</span>
     </button>
     <button class="nav-item tab-debts" data-tab="tabDebts" onclick="switchTab('tabDebts', this)">
       <span class="nav-icon">🤝</span>
@@ -2041,6 +2179,10 @@
           <input type="date" class="form-input" id="debtDate" required>
         </div>
         <div class="form-group">
+          <label class="form-label" data-i18n="dueDate">Qaytarish muddati (ixtiyoriy)</label>
+          <input type="date" class="form-input" id="debtDueDate">
+        </div>
+        <div class="form-group">
           <label class="form-label" data-i18n="reason">Sabab</label>
           <input type="text" class="form-input" id="debtReason" data-placeholder="debtReasonPlaceholder"
             placeholder="Sabab / maqsad..." required>
@@ -2106,10 +2248,12 @@
           <div class="form-checkbox-row"
             onclick="event.target.tagName !== 'INPUT' && (document.getElementById('debtPaymentAffectBalance').checked = !document.getElementById('debtPaymentAffectBalance').checked)">
             <input type="checkbox" id="debtPaymentAffectBalance" checked>
-            <label for="debtPaymentAffectBalance" data-i18n="debtPaymentAffectBalance">Karta/hisob balansiga qo'shilsin</label>
+            <label for="debtPaymentAffectBalance" data-i18n="debtPaymentAffectBalance">Karta/hisob balansiga
+              qo'shilsin</label>
           </div>
           <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;"
-            data-i18n="debtPaymentAffectBalanceHint">Belgilansa, to'lov summasi tanlangan karta balansiga qo'shiladi. Belgilanmasa, balans o'zgarmaydi.</small>
+            data-i18n="debtPaymentAffectBalanceHint">Belgilansa, to'lov summasi tanlangan karta balansiga qo'shiladi.
+            Belgilanmasa, balans o'zgarmaydi.</small>
         </div>
         <div class="form-group">
           <label class="form-label" data-i18n="paymentNote">Izoh (ixtiyoriy)</label>
@@ -2146,10 +2290,12 @@
           <div class="form-checkbox-row"
             onclick="event.target.tagName !== 'INPUT' && (document.getElementById('quickReturnAffectBalance').checked = !document.getElementById('quickReturnAffectBalance').checked)">
             <input type="checkbox" id="quickReturnAffectBalance" checked>
-            <label for="quickReturnAffectBalance" data-i18n="debtPaymentAffectBalance">Karta/hisob balansiga qo'shilsin</label>
+            <label for="quickReturnAffectBalance" data-i18n="debtPaymentAffectBalance">Karta/hisob balansiga
+              qo'shilsin</label>
           </div>
           <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;"
-            data-i18n="debtPaymentAffectBalanceHint">Belgilansa, to'lov summasi tanlangan karta balansiga qo'shiladi. Belgilanmasa, balans o'zgarmaydi.</small>
+            data-i18n="debtPaymentAffectBalanceHint">Belgilansa, to'lov summasi tanlangan karta balansiga qo'shiladi.
+            Belgilanmasa, balans o'zgarmaydi.</small>
         </div>
         <button type="submit" class="btn-submit green" data-i18n="confirmFullReturn">To'liq qaytarildi deb
           saqlash</button>
@@ -2990,6 +3136,8 @@
       uz: {
         headerTitle: '💰 Moliya Tracker',
         navIncome: 'Kirim-Chiqim',
+        navIncomeOnly: 'Kirimlar',
+        navExpenseOnly: 'Chiqimlar',
         navDebts: 'Qarzlar',
         navExpected: 'Kutilayotgan',
         grandTotal: '👑 Jami Balans',
@@ -3004,6 +3152,8 @@
         returned: 'Qaytarilgan',
         totalExpected: 'Kutilayotgan Jami',
         entries: 'Kirim-Chiqim Yozuvlari',
+        incomeEntries: 'Kirimlar',
+        expenseEntries: 'Chiqimlar',
         debtList: 'Qarzlar ro\'yxati',
         expectedList: 'Kutilayotgan Kirimlar',
         addEntry: 'Yozuv qo\'shish',
@@ -3018,6 +3168,15 @@
         date: 'Sana',
         dateGiven: 'Berilgan sana',
         dateExpected: 'Kutilayotgan sana',
+        dueDate: 'Qaytarish muddati (ixtiyoriy)',
+        dueToday: 'Bugun!',
+        dueOverdue: 'Muddati o\'tgan!',
+        dueDaysLeft: 'kun qoldi',
+        filterPeriod: 'Davr:',
+        clearFilter: 'Tozalash',
+        debtNotificationTitle: '⏰ Qarz qaytarish eslatmasi',
+        debtDueTodayMsg: 'qarzini bugun qaytarish muddati!',
+        debtOverdueMsg: 'qarzining qaytarish muddati o\'tib ketgan!',
         reason: 'Sabab',
         amount: 'Miqdor',
         name: 'Ism',
@@ -3028,6 +3187,8 @@
         cancel: 'Bekor qilish',
         confirm: 'Tasdiqlash',
         noEntries: 'Hali yozuvlar yo\'q',
+        noIncomeEntries: 'Hali kirim yozuvlari yo\'q',
+        noExpenseEntries: 'Hali chiqim yozuvlari yo\'q',
         noDebts: 'Hali qarzlar yo\'q',
         noExpected: 'Hali kutilayotgan kirimlar yo\'q',
         confirmDelete: 'Bu yozuvni o\'chirmoqchimisiz?',
@@ -3102,6 +3263,8 @@
       en: {
         headerTitle: '💰 Finance Tracker',
         navIncome: 'Income-Expense',
+        navIncomeOnly: 'Income',
+        navExpenseOnly: 'Expenses',
         navDebts: 'Debts',
         navExpected: 'Expected',
         grandTotal: '👑 Total Balance',
@@ -3116,6 +3279,8 @@
         returned: 'Returned',
         totalExpected: 'Total Expected',
         entries: 'Income-Expense Entries',
+        incomeEntries: 'Income',
+        expenseEntries: 'Expenses',
         debtList: 'Debt List',
         expectedList: 'Expected Income',
         addEntry: 'Add Entry',
@@ -3130,6 +3295,15 @@
         date: 'Date',
         dateGiven: 'Date Given',
         dateExpected: 'Date Expected',
+        dueDate: 'Due Date (optional)',
+        dueToday: 'Due Today!',
+        dueOverdue: 'Overdue!',
+        dueDaysLeft: 'days left',
+        filterPeriod: 'Period:',
+        clearFilter: 'Clear',
+        debtNotificationTitle: '⏰ Debt Due Reminder',
+        debtDueTodayMsg: '\'s debt is due today!',
+        debtOverdueMsg: '\'s debt is overdue!',
         reason: 'Reason',
         amount: 'Amount',
         name: 'Name',
@@ -3140,6 +3314,8 @@
         cancel: 'Cancel',
         confirm: 'Confirm',
         noEntries: 'No entries yet',
+        noIncomeEntries: 'No income entries yet',
+        noExpenseEntries: 'No expense entries yet',
         noDebts: 'No debts yet',
         noExpected: 'No expected income yet',
         confirmDelete: 'Are you sure you want to delete this entry?',
@@ -3212,6 +3388,25 @@
         transferSuccess: "Transfer saved successfully",
       }
     };
+        enterPassword: 'Enter password to access app',
+        loginBtn: 'Enter',
+        wrongPassword: 'Wrong password!',
+        copy: '📋 Copy',
+        copied: '✅ Copied!',
+        toastCopied: 'Amount copied',
+        close: 'Close',
+        tapToCopyHint: 'Tap to copy or use the button below',
+        transfer: "Transfer",
+        transferMoney: "🔄 Transfer Money",
+        fromSource: "From (Source)",
+        toSource: "To (Destination)",
+        executeTransfer: "🔄 Transfer",
+        editTransfer: "Edit Transfer",
+        transferReasonPlaceholder: "e.g. Cash to card, ATM...",
+        transferSameSourceError: "Source and destination cannot be the same!",
+        transferSuccess: "Transfer saved successfully",
+      }
+    };
 
     let currentLang = localStorage.getItem('finLang') || 'uz';
     let currentType = 'income';
@@ -3225,7 +3420,8 @@
       document.getElementById('langEn').classList.toggle('active', lang === 'en');
       applyTranslations();
       recalculateAndRenderAll();
-      renderIncomeList(cachedEntries);
+      renderIncomeOnlyList();
+      renderExpenseOnlyList();
       renderDebtList(cachedDebts);
       renderExpectedList(cachedExpected);
     }
@@ -3317,7 +3513,7 @@
     function openModal(type, editData) {
       const isEdit = !!editData;
 
-      if (type === 'income') {
+      if (type === 'income' || type === 'expense') {
         const form = document.getElementById('formIncome');
         form.reset();
         document.getElementById('incomeEditId').value = isEdit ? editData.id : '';
@@ -3325,7 +3521,7 @@
         document.getElementById('incomeReason').value = isEdit ? editData.reason : '';
         document.getElementById('incomeAmount').value = isEdit ? editData.amount : '';
         if (isEdit && editData.source) document.getElementById('incomeSource').value = editData.source;
-        setType(isEdit ? editData.type : 'income');
+        setType(isEdit ? editData.type : type);
 
         document.getElementById('modalIncomeTitle').textContent = t(isEdit ? 'editEntry' : 'addEntry');
         document.getElementById('incomeSubmitBtn').textContent = t(isEdit ? 'save' : 'add');
@@ -3337,6 +3533,7 @@
         document.getElementById('debtName').value = isEdit ? editData.name : '';
         document.getElementById('debtAmount').value = isEdit ? editData.amount : '';
         document.getElementById('debtDate').value = isEdit ? editData.date : todayStr();
+        document.getElementById('debtDueDate').value = isEdit ? (editData.dueDate || '') : '';
         document.getElementById('debtReason').value = isEdit ? editData.reason : '';
         if (isEdit && editData.source) document.getElementById('debtSource').value = editData.source;
         document.getElementById('debtAffectBalance').checked = isEdit ? (editData.affectBalance !== false) : true;
@@ -3573,6 +3770,55 @@
     }
 
     // =============================================
+    // DATE FILTERS STATE & ACTIONS
+    // =============================================
+    let incomeFilterFrom = '';
+    let incomeFilterTo = '';
+    let expenseFilterFrom = '';
+    let expenseFilterTo = '';
+    let debtFilterFrom = '';
+    let debtFilterTo = '';
+
+    function applyIncomeFilter() {
+      incomeFilterFrom = document.getElementById('incomeFilterFrom').value;
+      incomeFilterTo = document.getElementById('incomeFilterTo').value;
+      renderIncomeOnlyList();
+    }
+    function clearIncomeFilter() {
+      document.getElementById('incomeFilterFrom').value = '';
+      document.getElementById('incomeFilterTo').value = '';
+      incomeFilterFrom = '';
+      incomeFilterTo = '';
+      renderIncomeOnlyList();
+    }
+
+    function applyExpenseFilter() {
+      expenseFilterFrom = document.getElementById('expenseFilterFrom').value;
+      expenseFilterTo = document.getElementById('expenseFilterTo').value;
+      renderExpenseOnlyList();
+    }
+    function clearExpenseFilter() {
+      document.getElementById('expenseFilterFrom').value = '';
+      document.getElementById('expenseFilterTo').value = '';
+      expenseFilterFrom = '';
+      expenseFilterTo = '';
+      renderExpenseOnlyList();
+    }
+
+    function applyDebtFilter() {
+      debtFilterFrom = document.getElementById('debtFilterFrom').value;
+      debtFilterTo = document.getElementById('debtFilterTo').value;
+      renderDebtListFromCache();
+    }
+    function clearDebtFilter() {
+      document.getElementById('debtFilterFrom').value = '';
+      document.getElementById('debtFilterTo').value = '';
+      debtFilterFrom = '';
+      debtFilterTo = '';
+      renderDebtListFromCache();
+    }
+
+    // =============================================
     // INCOME / EXPENSE LOGIC
     // =============================================
     function submitIncome(e) {
@@ -3601,14 +3847,14 @@
         db.ref('entries/' + id).once('value', snap => {
           if (!snap.exists()) return;
           const data = { id, ...snap.val() };
-          openModal('income', data);
+          openModal(data.type || 'income', data);
         });
       } else {
         const all = lsGetAll('entries');
         const data = all[id];
         if (!data) return;
         data.id = id;
-        openModal('income', data);
+        openModal(data.type || 'income', data);
       }
     }
 
@@ -3621,34 +3867,45 @@
 
     function renderIncomeList(entries) {
       cachedEntries = entries || [];
-      const list = document.getElementById('incomeList');
-      const empty = document.getElementById('incomeEmpty');
-      list.innerHTML = '';
-
       cachedEntries.sort((a, b) => {
         if (b.date !== a.date) return b.date.localeCompare(a.date);
         return (b.createdAt || 0) - (a.createdAt || 0);
       });
+      renderIncomeOnlyList();
+      renderExpenseOnlyList();
+      recalculateAndRenderAll();
+    }
 
-      if (cachedEntries.length === 0) {
+    function renderIncomeOnlyList() {
+      const list = document.getElementById('incomeList');
+      const empty = document.getElementById('incomeEmpty');
+      if (!list) return;
+      list.innerHTML = '';
+
+      let items = cachedEntries.filter(e => e.type === 'income' || e.type === 'transfer');
+
+      if (incomeFilterFrom) {
+        items = items.filter(e => e.date >= incomeFilterFrom);
+      }
+      if (incomeFilterTo) {
+        items = items.filter(e => e.date <= incomeFilterTo);
+      }
+
+      if (items.length === 0) {
         empty.style.display = 'block';
-        applyTranslations();
       } else {
         empty.style.display = 'none';
       }
 
-      let totalIn = 0, totalOut = 0;
-      cachedEntries.forEach(e => {
+      let totalIn = 0;
+      items.forEach(e => {
         if (e.type === 'income') totalIn += e.amount;
-        else if (e.type === 'expense') totalOut += e.amount;
       });
 
-      document.getElementById('totalIncome').textContent = formatNum(totalIn);
-      document.getElementById('totalExpense').textContent = formatNum(totalOut);
+      const totalIncomeEl = document.getElementById('totalIncome');
+      if (totalIncomeEl) totalIncomeEl.textContent = formatNum(totalIn);
 
-      recalculateAndRenderAll();
-
-      cachedEntries.forEach(e => {
+      items.forEach(e => {
         const card = document.createElement('div');
         card.className = 'entry-card';
 
@@ -3680,19 +3937,70 @@
         } else {
           const srcBadge = getSourceBadge(e.source);
           card.innerHTML = `
-            <div class="entry-icon ${e.type}">${e.type === 'income' ? '📈' : '📉'}</div>
+            <div class="entry-icon income">📈</div>
             <div class="entry-info">
               <div class="entry-reason">${esc(e.reason)}</div>
               <div class="entry-meta">${formatDate(e.date)}</div>
               ${srcBadge}
             </div>
-            <div class="entry-amount ${e.type}">${e.type === 'income' ? '+' : '-'}${formatNum(e.amount)}</div>
+            <div class="entry-amount income">+${formatNum(e.amount)}</div>
             <div class="entry-actions">
               <button class="btn-action edit" onclick="editIncome('${e.id}')" aria-label="Edit">✏️</button>
               <button class="btn-action delete" onclick="deleteIncome('${e.id}')" aria-label="Delete">🗑</button>
             </div>
           `;
         }
+        list.appendChild(card);
+      });
+    }
+
+    function renderExpenseOnlyList() {
+      const list = document.getElementById('expenseList');
+      const empty = document.getElementById('expenseEmpty');
+      if (!list) return;
+      list.innerHTML = '';
+
+      let items = cachedEntries.filter(e => e.type === 'expense');
+
+      if (expenseFilterFrom) {
+        items = items.filter(e => e.date >= expenseFilterFrom);
+      }
+      if (expenseFilterTo) {
+        items = items.filter(e => e.date <= expenseFilterTo);
+      }
+
+      if (items.length === 0) {
+        empty.style.display = 'block';
+      } else {
+        empty.style.display = 'none';
+      }
+
+      let totalOut = 0;
+      items.forEach(e => {
+        totalOut += e.amount;
+      });
+
+      const totalExpenseEl = document.getElementById('totalExpense');
+      if (totalExpenseEl) totalExpenseEl.textContent = formatNum(totalOut);
+
+      items.forEach(e => {
+        const card = document.createElement('div');
+        card.className = 'entry-card';
+        const srcBadge = getSourceBadge(e.source);
+
+        card.innerHTML = `
+          <div class="entry-icon expense">📉</div>
+          <div class="entry-info">
+            <div class="entry-reason">${esc(e.reason)}</div>
+            <div class="entry-meta">${formatDate(e.date)}</div>
+            ${srcBadge}
+          </div>
+          <div class="entry-amount expense">-${formatNum(e.amount)}</div>
+          <div class="entry-actions">
+            <button class="btn-action edit" onclick="editIncome('${e.id}')" aria-label="Edit">✏️</button>
+            <button class="btn-action delete" onclick="deleteIncome('${e.id}')" aria-label="Delete">🗑</button>
+          </div>
+        `;
         list.appendChild(card);
       });
     }
@@ -3795,10 +4103,12 @@
     function submitDebt(e) {
       e.preventDefault();
       const editId = document.getElementById('debtEditId').value;
+      const dueDate = document.getElementById('debtDueDate').value || null;
       const entry = {
         name: document.getElementById('debtName').value.trim(),
         amount: parseFloat(document.getElementById('debtAmount').value),
         date: document.getElementById('debtDate').value,
+        dueDate: dueDate,
         reason: document.getElementById('debtReason').value.trim(),
         source: document.getElementById('debtSource').value,
         affectBalance: document.getElementById('debtAffectBalance').checked,
@@ -3999,6 +4309,7 @@
       cachedDebts = debts || [];
       renderDebtListFromCache();
       recalculateAndRenderAll();
+      checkDueDateNotifications(cachedDebts);
     }
 
     function renderDebtListFromCache() {
@@ -4049,8 +4360,18 @@
       }
 
       let filtered = debts;
+
+      // Apply date filter for debts
+      if (debtFilterFrom) {
+        filtered = filtered.filter(d => d.date >= debtFilterFrom);
+      }
+      if (debtFilterTo) {
+        filtered = filtered.filter(d => d.date <= debtFilterTo);
+      }
+
+      // Apply person filter
       if (debtFilterPerson) {
-        filtered = debts.filter(d => d.name === debtFilterPerson);
+        filtered = filtered.filter(d => d.name === debtFilterPerson);
       }
 
       filtered.sort((a, b) => {
@@ -4067,7 +4388,7 @@
       }
 
       let totalActive = 0, totalRet = 0;
-      debts.forEach(d => {
+      filtered.forEach(d => {
         const { paidAmount, remainingAmount } = getDebtProgress(d);
         totalRet += paidAmount;
         totalActive += remainingAmount;
@@ -4076,12 +4397,29 @@
       document.getElementById('totalDebts').textContent = formatNum(totalActive);
       document.getElementById('totalReturned').textContent = formatNum(totalRet);
 
+      const today = todayStr();
+
       filtered.forEach(d => {
         const { paidAmount, remainingAmount, percent } = getDebtProgress(d);
         const isFullyReturned = d.returned || remainingAmount <= 0;
         const isPartial = paidAmount > 0 && remainingAmount > 0;
         const srcBadge = getSourceBadge(d.source);
         const noAffectBadge = d.affectBalance === false ? `<span class="entry-source" style="background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.25);">🚫 ${t('noBalanceImpact')}</span>` : '';
+
+        // Due date badge
+        let dueDateBadgeHtml = '';
+        if (d.dueDate && !isFullyReturned) {
+          if (d.dueDate === today) {
+            dueDateBadgeHtml = `<span class="due-date-badge today">⏰ ${t('dueToday')} (${formatDate(d.dueDate)})</span>`;
+          } else if (d.dueDate < today) {
+            dueDateBadgeHtml = `<span class="due-date-badge overdue">⚠️ ${t('dueOverdue')} (${formatDate(d.dueDate)})</span>`;
+          } else {
+            const daysLeft = Math.ceil((new Date(d.dueDate) - new Date(today)) / (1000 * 60 * 60 * 24));
+            dueDateBadgeHtml = `<span class="due-date-badge upcoming">⏳ ${formatDate(d.dueDate)} (${daysLeft} ${t('dueDaysLeft')})</span>`;
+          }
+        } else if (d.dueDate) {
+          dueDateBadgeHtml = `<span class="due-date-badge upcoming" style="opacity:0.6;">📅 ${formatDate(d.dueDate)}</span>`;
+        }
 
         const cardWrapper = document.createElement('div');
         cardWrapper.className = 'debt-card-wrapper' + (isFullyReturned ? ' returned-card' : '');
@@ -4117,7 +4455,11 @@
             <div class="entry-info">
               <div class="entry-reason">${esc(d.name)}</div>
               <div class="entry-meta">${formatDate(d.date)} · ${esc(d.reason)}</div>
-              <div style="display:flex; gap:6px; flex-wrap:wrap;">${srcBadge}${noAffectBadge}</div>
+              <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                ${srcBadge}
+                ${noAffectBadge}
+                ${dueDateBadgeHtml}
+              </div>
             </div>
             <div style="text-align:right; flex-shrink:0;">
               <div class="entry-amount debt">${formatNum(d.amount)}</div>
@@ -4153,6 +4495,55 @@
         `;
         list.appendChild(cardWrapper);
       });
+    }
+
+    // =============================================
+    // BROWSER NOTIFICATIONS FOR DUE DATES
+    // =============================================
+    function requestNotificationPermission() {
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission().then(perm => {
+          if (perm === 'granted') {
+            checkDueDateNotifications(cachedDebts);
+          }
+        });
+      }
+    }
+
+    function checkDueDateNotifications(debts) {
+      if (!('Notification' in window) || Notification.permission !== 'granted') {
+        return;
+      }
+      const today = todayStr();
+      const sessionKey = 'fin_notified_debts_' + today;
+      let notifiedMap = {};
+      try {
+        notifiedMap = JSON.parse(sessionStorage.getItem(sessionKey)) || {};
+      } catch (e) {}
+
+      debts.forEach(d => {
+        if (d.returned || !d.dueDate) return;
+        const { remainingAmount } = getDebtProgress(d);
+        if (remainingAmount <= 0) return;
+
+        if (!notifiedMap[d.id]) {
+          if (d.dueDate === today) {
+            new Notification(t('debtNotificationTitle'), {
+              body: `${d.name} (${formatNum(remainingAmount)}) ${t('debtDueTodayMsg')}`,
+              icon: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⏰</text></svg>'
+            });
+            notifiedMap[d.id] = true;
+          } else if (d.dueDate < today) {
+            new Notification(t('debtNotificationTitle'), {
+              body: `⚠️ ${d.name} (${formatNum(remainingAmount)}) ${t('debtOverdueMsg')}`,
+              icon: 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚠️</text></svg>'
+            });
+            notifiedMap[d.id] = true;
+          }
+        }
+      });
+
+      sessionStorage.setItem(sessionKey, JSON.stringify(notifiedMap));
     }
 
     // =============================================
@@ -4314,6 +4705,7 @@
     populateSourceSelects();
     applySummaryState();
     setLang(currentLang);
+    requestNotificationPermission();
   </script>
 </body>
 
