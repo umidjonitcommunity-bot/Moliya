@@ -2429,10 +2429,10 @@
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label" data-i18n="initialBalance">Boshlang'ich Balans</label>
+          <label class="form-label" data-i18n="initialBalance">Balans</label>
           <input type="number" class="form-input" id="sourceEditInitial" placeholder="0" step="any" inputmode="decimal">
           <small style="color:var(--text-muted); font-size:12px; margin-top:4px; display:block;"
-            data-i18n="initialBalanceHint">Kartada dastlab mavjud bo'lgan pul miqdori.</small>
+            data-i18n="initialBalanceHint">Kartadagi hozirgi pul miqdori.</small>
         </div>
         <button type="submit" class="btn-submit blue" id="sourceEditSubmitBtn" data-i18n="save">Saqlash</button>
         <button type="button" class="btn-cancel" onclick="closeModal('modalSourceEdit')" data-i18n="cancel">Bekor
@@ -2703,9 +2703,11 @@
       const sources = getSources();
       const s = sources.find(x => x.id === id);
       if (!s) return;
+      const { statsMap } = calculateSourceStats();
+      const currentBalance = statsMap[id] ? statsMap[id].balance : (s.initialBalance || 0);
       document.getElementById('sourceEditId').value = s.id;
       document.getElementById('sourceEditName').value = s.name;
-      document.getElementById('sourceEditInitial').value = s.initialBalance || 0;
+      document.getElementById('sourceEditInitial').value = currentBalance;
       setSourceType(isCashSource(s.id, s.name, s.type) ? 'cash' : 'card');
       document.getElementById('sourceEditModalTitle').textContent = t('editSource');
       document.getElementById('sourceEditSubmitBtn').textContent = t('save');
@@ -2716,7 +2718,7 @@
       e.preventDefault();
       const id = document.getElementById('sourceEditId').value;
       const name = document.getElementById('sourceEditName').value.trim();
-      const initialBalance = parseFloat(document.getElementById('sourceEditInitial').value) || 0;
+      const enteredBalance = parseFloat(document.getElementById('sourceEditInitial').value) || 0;
       const type = currentSourceType;
 
       if (!name) return;
@@ -2727,12 +2729,15 @@
         if (s) {
           s.name = name;
           s.type = type;
-          s.initialBalance = initialBalance;
+          const { statsMap } = calculateSourceStats();
+          const currentStat = statsMap[id] || { balance: s.initialBalance || 0 };
+          const netTransactions = (currentStat.balance || 0) - (s.initialBalance || 0);
+          s.initialBalance = enteredBalance - netTransactions;
         }
         showToast(t('toastSourceUpdated'));
       } else {
         const newId = 'src_' + Date.now().toString(36);
-        sources.push({ id: newId, name, type, initialBalance });
+        sources.push({ id: newId, name, type, initialBalance: enteredBalance });
         showToast(t('toastSourceAdded'));
       }
 
@@ -3234,8 +3239,8 @@
         editSource: 'Kartani tahrirlash',
         sourceName: 'Karta / Manba nomi',
         sourceType: 'Turi',
-        initialBalance: 'Boshlang\'ich Balans',
-        initialBalanceHint: 'Kartada dastlab mavjud bo\'lgan pul miqdori.',
+        initialBalance: 'Balans',
+        initialBalanceHint: 'Kartadagi hozirgi pul miqdori.',
         debtGivenFromSource: 'Qaysi kartadan/manbadan berildi?',
         debtSourceHint: 'Ushbu summa tanlangan karta balansidan ayriladi.',
         debtAffectBalance: 'Karta/hisob balansidan ayirilsin',
@@ -3361,8 +3366,8 @@
         editSource: 'Edit card/source',
         sourceName: 'Card / Source name',
         sourceType: 'Type',
-        initialBalance: 'Initial Balance',
-        initialBalanceHint: 'Initial amount existing in this card/account.',
+        initialBalance: 'Card Balance',
+        initialBalanceHint: 'Current balance for this card/account.',
         debtGivenFromSource: 'Given from which card/source?',
         debtSourceHint: 'This amount will be deducted from the selected card balance.',
         debtAffectBalance: 'Deduct from card/account balance',
