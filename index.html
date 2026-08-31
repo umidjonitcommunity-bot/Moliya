@@ -3019,22 +3019,49 @@
         cardsEl.style.color = totalCards >= 0 ? 'var(--blue)' : 'var(--red)';
       }
 
-      // Total Income and Expense from full dataset
-      let totalInc = 0;
-      let totalExp = 0;
-      cachedEntries.forEach(e => {
-        if (e.type === 'income') totalInc += (e.amount || 0);
-        else if (e.type === 'expense') totalExp += (e.amount || 0);
-      });
-
-      const totalIncomeEl = document.getElementById('totalIncome');
-      if (totalIncomeEl) totalIncomeEl.textContent = formatNum(totalInc);
-
-      const totalExpenseEl = document.getElementById('totalExpense');
-      if (totalExpenseEl) totalExpenseEl.textContent = formatNum(totalExp);
+      // Total Income and Expense (calculated by active date filter if set)
+      updateIncomeExpenseDisplay();
 
       // Render Cards bar on main screen
       renderCardsBar(statsMap);
+    }
+
+    // =============================================
+    // INCOME & EXPENSE CALCULATION HELPERS
+    // =============================================
+    function calculateFilteredIncome(entries = cachedEntries, fromDate = incomeFilterFrom, toDate = incomeFilterTo) {
+      let total = 0;
+      (entries || []).forEach(e => {
+        if (e.type === 'income') {
+          const matchFrom = !fromDate || e.date >= fromDate;
+          const matchTo = !toDate || e.date <= toDate;
+          if (matchFrom && matchTo) total += (e.amount || 0);
+        }
+      });
+      return total;
+    }
+
+    function calculateFilteredExpense(entries = cachedEntries, fromDate = expenseFilterFrom, toDate = expenseFilterTo) {
+      let total = 0;
+      (entries || []).forEach(e => {
+        if (e.type === 'expense') {
+          const matchFrom = !fromDate || e.date >= fromDate;
+          const matchTo = !toDate || e.date <= toDate;
+          if (matchFrom && matchTo) total += (e.amount || 0);
+        }
+      });
+      return total;
+    }
+
+    function updateIncomeExpenseDisplay() {
+      const totalIncomeEl = document.getElementById('totalIncome');
+      if (totalIncomeEl) {
+        totalIncomeEl.textContent = formatNum(calculateFilteredIncome());
+      }
+      const totalExpenseEl = document.getElementById('totalExpense');
+      if (totalExpenseEl) {
+        totalExpenseEl.textContent = formatNum(calculateFilteredExpense());
+      }
     }
 
     function renderCardsBar(statsMap) {
@@ -3908,6 +3935,9 @@
         empty.style.display = 'none';
       }
 
+      const totalIncomeEl = document.getElementById('totalIncome');
+      if (totalIncomeEl) totalIncomeEl.textContent = formatNum(calculateFilteredIncome());
+
       items.forEach(e => {
         const card = document.createElement('div');
         card.className = 'entry-card';
@@ -3977,6 +4007,9 @@
       } else {
         empty.style.display = 'none';
       }
+
+      const totalExpenseEl = document.getElementById('totalExpense');
+      if (totalExpenseEl) totalExpenseEl.textContent = formatNum(calculateFilteredExpense());
 
       items.forEach(e => {
         const card = document.createElement('div');
