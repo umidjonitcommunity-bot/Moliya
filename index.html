@@ -1865,8 +1865,15 @@
     }
 
     @keyframes pulse-glow {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
+
+      0%,
+      100% {
+        opacity: 1;
+      }
+
+      50% {
+        opacity: 0.7;
+      }
     }
 
     .nav-item.active.tab-expense::before {
@@ -1969,7 +1976,8 @@
         <input type="date" class="form-input" id="incomeFilterFrom" onchange="applyIncomeFilter()">
         <span class="filter-label">—</span>
         <input type="date" class="form-input" id="incomeFilterTo" onchange="applyIncomeFilter()">
-        <button type="button" class="btn-filter-clear" onclick="clearIncomeFilter()" data-i18n="clearFilter">Tozalash</button>
+        <button type="button" class="btn-filter-clear" onclick="clearIncomeFilter()"
+          data-i18n="clearFilter">Tozalash</button>
       </div>
 
       <div class="section-header">
@@ -2008,12 +2016,14 @@
         <input type="date" class="form-input" id="expenseFilterFrom" onchange="applyExpenseFilter()">
         <span class="filter-label">—</span>
         <input type="date" class="form-input" id="expenseFilterTo" onchange="applyExpenseFilter()">
-        <button type="button" class="btn-filter-clear" onclick="clearExpenseFilter()" data-i18n="clearFilter">Tozalash</button>
+        <button type="button" class="btn-filter-clear" onclick="clearExpenseFilter()"
+          data-i18n="clearFilter">Tozalash</button>
       </div>
 
       <div class="section-header">
         <h2 class="section-title" data-i18n="expenseEntries">Chiqimlar</h2>
-        <button class="btn-add green" style="background:var(--red); box-shadow:0 4px 16px var(--red-glow);" onclick="openModal('income'); setTimeout(()=>setType('expense'),50)" aria-label="Add expense">＋</button>
+        <button class="btn-add green" style="background:var(--red); box-shadow:0 4px 16px var(--red-glow);"
+          onclick="openModal('income'); setTimeout(()=>setType('expense'),50)" aria-label="Add expense">＋</button>
       </div>
       <div class="entry-list" id="expenseList"></div>
       <div class="empty-state" id="expenseEmpty" style="display:none;">
@@ -2044,7 +2054,8 @@
         <input type="date" class="form-input" id="debtFilterFrom" onchange="applyDebtFilter()">
         <span class="filter-label">—</span>
         <input type="date" class="form-input" id="debtFilterTo" onchange="applyDebtFilter()">
-        <button type="button" class="btn-filter-clear" onclick="clearDebtFilter()" data-i18n="clearFilter">Tozalash</button>
+        <button type="button" class="btn-filter-clear" onclick="clearDebtFilter()"
+          data-i18n="clearFilter">Tozalash</button>
       </div>
       <div id="debtFilterChips" class="filter-chips"></div>
       <div id="personTotalBanner" class="person-total-banner" style="display:none;" onclick="showPersonTotalDetail()"
@@ -3003,6 +3014,20 @@
         cardsEl.style.color = totalCards >= 0 ? 'var(--blue)' : 'var(--red)';
       }
 
+      // Total Income and Expense from full dataset
+      let totalInc = 0;
+      let totalExp = 0;
+      cachedEntries.forEach(e => {
+        if (e.type === 'income') totalInc += (e.amount || 0);
+        else if (e.type === 'expense') totalExp += (e.amount || 0);
+      });
+
+      const totalIncomeEl = document.getElementById('totalIncome');
+      if (totalIncomeEl) totalIncomeEl.textContent = formatNum(totalInc);
+
+      const totalExpenseEl = document.getElementById('totalExpense');
+      if (totalExpenseEl) totalExpenseEl.textContent = formatNum(totalExp);
+
       // Render Cards bar on main screen
       renderCardsBar(statsMap);
     }
@@ -3878,14 +3903,6 @@
         empty.style.display = 'none';
       }
 
-      let totalIn = 0;
-      items.forEach(e => {
-        if (e.type === 'income') totalIn += e.amount;
-      });
-
-      const totalIncomeEl = document.getElementById('totalIncome');
-      if (totalIncomeEl) totalIncomeEl.textContent = formatNum(totalIn);
-
       items.forEach(e => {
         const card = document.createElement('div');
         card.className = 'entry-card';
@@ -3955,14 +3972,6 @@
       } else {
         empty.style.display = 'none';
       }
-
-      let totalOut = 0;
-      items.forEach(e => {
-        totalOut += e.amount;
-      });
-
-      const totalExpenseEl = document.getElementById('totalExpense');
-      if (totalExpenseEl) totalExpenseEl.textContent = formatNum(totalOut);
 
       items.forEach(e => {
         const card = document.createElement('div');
@@ -4500,7 +4509,7 @@
       let notifiedMap = {};
       try {
         notifiedMap = JSON.parse(sessionStorage.getItem(sessionKey)) || {};
-      } catch (e) {}
+      } catch (e) { }
 
       debts.forEach(d => {
         if (d.returned || !d.dueDate) return;
