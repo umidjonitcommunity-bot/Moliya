@@ -3831,7 +3831,7 @@
       e.preventDefault();
       const editId = document.getElementById('incomeEditId').value;
       const entry = {
-        type: currentType,
+        type: document.getElementById('typeBtnExpense').classList.contains('active') ? 'expense' : 'income',
         date: document.getElementById('incomeDate').value,
         reason: document.getElementById('incomeReason').value.trim(),
         amount: parseFloat(document.getElementById('incomeAmount').value),
