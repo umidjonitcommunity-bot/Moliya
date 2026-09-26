@@ -1879,6 +1879,170 @@
     .nav-item.active.tab-expense::before {
       background: var(--red);
     }
+
+    /* ===== SOURCE / CARD FILTER STYLES ===== */
+    .summary-card.selectable-filter {
+      cursor: pointer;
+      position: relative;
+    }
+
+    .summary-card.active-filter {
+      border-color: rgba(255, 255, 255, 0.45) !important;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35), var(--shadow) !important;
+      transform: translateY(-2px);
+    }
+
+    .summary-card.teal.active-filter {
+      border-color: var(--teal) !important;
+      box-shadow: 0 0 0 2px var(--teal), 0 4px 20px var(--teal-soft) !important;
+    }
+
+    .summary-card.blue.active-filter {
+      border-color: var(--blue) !important;
+      box-shadow: 0 0 0 2px var(--blue), 0 4px 20px var(--blue-soft) !important;
+    }
+
+    .summary-card.grand-total.active-filter {
+      border-color: #60a5fa !important;
+      box-shadow: 0 0 0 2px #60a5fa, 0 4px 20px rgba(59, 130, 246, 0.3) !important;
+    }
+
+    .card-item-box.active-source-box {
+      border-color: var(--blue) !important;
+      box-shadow: 0 0 0 2px var(--blue), var(--shadow) !important;
+      background: rgba(59, 130, 246, 0.12) !important;
+      transform: translateY(-2px);
+    }
+
+    .card-item-box.cash-type.active-source-box {
+      border-color: var(--teal) !important;
+      box-shadow: 0 0 0 2px var(--teal), var(--shadow) !important;
+      background: rgba(20, 184, 166, 0.12) !important;
+    }
+
+    .card-item-box.active-source-box .card-box-top::after {
+      content: '✓';
+      font-size: 11px;
+      font-weight: 800;
+      color: #fff;
+      background: var(--blue);
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .card-item-box.cash-type.active-source-box .card-box-top::after {
+      background: var(--teal);
+    }
+
+    .source-filter-banner {
+      background: linear-gradient(135deg, rgba(30, 35, 48, 0.95), rgba(22, 26, 37, 0.95));
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      box-shadow: var(--shadow);
+      animation: fadeIn 0.25s ease;
+    }
+
+    .source-filter-banner.cash-theme {
+      border-color: rgba(20, 184, 166, 0.4);
+      background: linear-gradient(135deg, rgba(20, 184, 166, 0.15), rgba(15, 23, 42, 0.9));
+    }
+
+    .source-filter-banner.card-theme {
+      border-color: rgba(59, 130, 246, 0.4);
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(15, 23, 42, 0.9));
+    }
+
+    .sfb-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .sfb-icon {
+      font-size: 26px;
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+    }
+
+    .sfb-info {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .sfb-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sfb-balance {
+      font-size: 16px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      margin-top: 1px;
+    }
+
+    .sfb-clear-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .sfb-clear-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .sfb-detail-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-secondary);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+
+    .sfb-detail-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      color: var(--text);
+    }
   </style>
 </head>
 
@@ -1923,15 +2087,15 @@
 
         <!-- Row 1: Grand Total, Cash Balance, Cards Balance -->
         <div class="summary-grid main-balances" id="incomeSummaryGrid">
-          <div class="summary-card grand-total" onclick="showAmountDetail('grandTotal')" title="Kattaroq ko'rish">
+          <div class="summary-card grand-total selectable-filter" id="cardGrandTotal" onclick="handleCardClick('grandTotal')" title="Barcha operatsiyalar / Jami">
             <div class="summary-label" data-i18n="grandTotal">👑 Jami Balans</div>
             <div class="summary-value" id="grandTotal">0</div>
           </div>
-          <div class="summary-card teal" onclick="showAmountDetail('cashBalance')" title="Kattaroq ko'rish">
+          <div class="summary-card teal selectable-filter" id="cardCashBalance" onclick="handleCardClick('cashBalance')" title="Naqd pul bo'yicha filtrlash">
             <div class="summary-label" data-i18n="cashBalance">💵 Naqd Balans</div>
             <div class="summary-value" id="cashBalance">0</div>
           </div>
-          <div class="summary-card blue" onclick="showAmountDetail('cardsBalance')" title="Kattaroq ko'rish">
+          <div class="summary-card blue selectable-filter" id="cardCardsBalance" onclick="handleCardClick('cardsBalance')" title="Kartalar bo'yicha filtrlash">
             <div class="summary-label" data-i18n="cardsBalance">💳 Kartalar</div>
             <div class="summary-value" id="cardsBalance">0</div>
           </div>
@@ -1969,6 +2133,9 @@
         </div>
         <div class="cards-grid" id="cardsBarContainer"></div>
       </div>
+
+      <!-- Active Source / Card Filter Banner (Income Tab) -->
+      <div id="sourceFilterBannerIncome" class="source-filter-banner" style="display:none;"></div>
 
       <!-- Date Filter for Income -->
       <div class="date-filter-bar" id="incomeFilterBar">
@@ -2009,6 +2176,9 @@
           </div>
         </div>
       </div>
+
+      <!-- Active Source / Card Filter Banner (Expense Tab) -->
+      <div id="sourceFilterBannerExpense" class="source-filter-banner" style="display:none;"></div>
 
       <!-- Date Filter for Expenses -->
       <div class="date-filter-bar" id="expenseFilterBar">
@@ -2998,6 +3168,155 @@
       };
     }
 
+    // =============================================
+    // SOURCE & CARD FILTER STATE & LOGIC
+    // =============================================
+    let activeSourceFilter = null;
+
+    function entryMatchesSourceFilter(entry, filter) {
+      if (!filter) return true;
+      const sources = getSources();
+
+      if (entry.type === 'transfer') {
+        const fromId = entry.fromSource;
+        const toId = entry.toSource;
+        const fromSrc = sources.find(s => s.id === fromId);
+        const toSrc = sources.find(s => s.id === toId);
+        const fromIsCash = isCashSource(fromId, fromSrc ? fromSrc.name : fromId, fromSrc ? fromSrc.type : null);
+        const toIsCash = isCashSource(toId, toSrc ? toSrc.name : toId, toSrc ? toSrc.type : null);
+
+        if (filter === 'cash_all') {
+          return fromIsCash || toIsCash;
+        }
+        if (filter === 'card_all') {
+          return (!fromIsCash) || (!toIsCash);
+        }
+        return fromId === filter || toId === filter;
+      }
+
+      const srcId = entry.source || (sources[0] ? sources[0].id : 'cash');
+      const src = sources.find(s => s.id === srcId);
+      const isCash = isCashSource(srcId, src ? src.name : srcId, src ? src.type : null);
+
+      if (filter === 'cash_all') {
+        return isCash;
+      }
+      if (filter === 'card_all') {
+        return !isCash;
+      }
+      return srcId === filter;
+    }
+
+    function selectSourceFilter(sourceId) {
+      if (activeSourceFilter === sourceId) {
+        activeSourceFilter = null; // Qayta bosilganda bekor qilish
+      } else {
+        activeSourceFilter = sourceId;
+      }
+
+      recalculateAndRenderAll();
+      renderIncomeOnlyList();
+      renderExpenseOnlyList();
+      updateSourceFilterBanner();
+    }
+
+    function handleCardClick(type) {
+      if (type === 'grandTotal') {
+        selectSourceFilter(null);
+      } else if (type === 'cashBalance') {
+        selectSourceFilter('cash_all');
+      } else if (type === 'cardsBalance') {
+        selectSourceFilter('card_all');
+      } else {
+        showAmountDetail(type);
+      }
+    }
+
+    function showSourceFilteredDetail() {
+      if (activeSourceFilter === 'cash_all') {
+        showAmountDetail('cashBalance');
+      } else if (activeSourceFilter === 'card_all') {
+        showAmountDetail('cardsBalance');
+      } else if (activeSourceFilter) {
+        const { statsMap } = calculateSourceStats();
+        if (statsMap[activeSourceFilter]) {
+          showCardDetail(statsMap[activeSourceFilter]);
+        }
+      } else {
+        showAmountDetail('grandTotal');
+      }
+    }
+
+    function updateSourceFilterBanner() {
+      const bannerInc = document.getElementById('sourceFilterBannerIncome');
+      const bannerExp = document.getElementById('sourceFilterBannerExpense');
+      const { statsMap, totalCash, totalCards } = calculateSourceStats();
+
+      // Top cards active state
+      const cGrand = document.getElementById('cardGrandTotal');
+      const cCash = document.getElementById('cardCashBalance');
+      const cCards = document.getElementById('cardCardsBalance');
+
+      if (cGrand) cGrand.classList.toggle('active-filter', activeSourceFilter === null);
+      if (cCash) cCash.classList.toggle('active-filter', activeSourceFilter === 'cash_all');
+      if (cCards) cCards.classList.toggle('active-filter', activeSourceFilter === 'card_all');
+
+      if (!activeSourceFilter) {
+        if (bannerInc) bannerInc.style.display = 'none';
+        if (bannerExp) bannerExp.style.display = 'none';
+        return;
+      }
+
+      let icon = '💳';
+      let title = '';
+      let balance = 0;
+      let themeClass = 'card-theme';
+
+      if (activeSourceFilter === 'cash_all') {
+        icon = '💵';
+        title = t('filterOnlyCash');
+        balance = totalCash;
+        themeClass = 'cash-theme';
+      } else if (activeSourceFilter === 'card_all') {
+        icon = '💳';
+        title = t('filterOnlyCards');
+        balance = totalCards;
+        themeClass = 'card-theme';
+      } else {
+        const src = getSources().find(s => s.id === activeSourceFilter);
+        const isCash = src ? isCashSource(src.id, src.name, src.type) : false;
+        icon = isCash ? '💵' : '💳';
+        const rawTpl = t('filterOnlySource') || "Faqat {name} operatsiyalari";
+        title = rawTpl.replace('{name}', src ? src.name : activeSourceFilter);
+        balance = statsMap[activeSourceFilter] ? statsMap[activeSourceFilter].balance : 0;
+        themeClass = isCash ? 'cash-theme' : 'card-theme';
+      }
+
+      const balColor = balance >= 0 ? 'var(--green)' : 'var(--red)';
+      const balFormatted = (balance >= 0 ? '+' : '') + formatNum(balance);
+
+      const html = `
+        <div class="sfb-left">
+          <span class="sfb-icon">${icon}</span>
+          <div class="sfb-info">
+            <span class="sfb-title">${esc(title)}</span>
+            <span class="sfb-balance" style="color:${balColor};">${t('balance')}: ${balFormatted}</span>
+          </div>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <button type="button" class="sfb-detail-btn" onclick="showSourceFilteredDetail()" title="Kattaroq ko'rish" aria-label="Detail">🔍</button>
+          <button type="button" class="sfb-clear-btn" onclick="selectSourceFilter(null)">${t('showAllOperations')}</button>
+        </div>
+      `;
+
+      [bannerInc, bannerExp].forEach(b => {
+        if (!b) return;
+        b.className = `source-filter-banner ${themeClass}`;
+        b.innerHTML = html;
+        b.style.display = 'flex';
+      });
+    }
+
     function recalculateAndRenderAll() {
       const { statsMap, totalCash, totalCards, grandTotal } = calculateSourceStats();
 
@@ -3024,6 +3343,9 @@
 
       // Render Cards bar on main screen
       renderCardsBar(statsMap);
+
+      // Render Filter banner state
+      updateSourceFilterBanner();
     }
 
     // =============================================
@@ -3035,7 +3357,8 @@
         if (e.type === 'income') {
           const matchFrom = !fromDate || e.date >= fromDate;
           const matchTo = !toDate || e.date <= toDate;
-          if (matchFrom && matchTo) total += (e.amount || 0);
+          const matchSource = entryMatchesSourceFilter(e, activeSourceFilter);
+          if (matchFrom && matchTo && matchSource) total += (e.amount || 0);
         }
       });
       return total;
@@ -3047,7 +3370,8 @@
         if (e.type === 'expense') {
           const matchFrom = !fromDate || e.date >= fromDate;
           const matchTo = !toDate || e.date <= toDate;
-          if (matchFrom && matchTo) total += (e.amount || 0);
+          const matchSource = entryMatchesSourceFilter(e, activeSourceFilter);
+          if (matchFrom && matchTo && matchSource) total += (e.amount || 0);
         }
       });
       return total;
@@ -3086,15 +3410,21 @@
         const icon = stat.type === 'cash' ? '💵' : '💳';
         const typeClass = stat.type === 'cash' ? 'cash-type' : 'card-type';
         const balColor = stat.balance >= 0 ? 'var(--green)' : 'var(--red)';
+        const isActive = activeSourceFilter === src.id;
 
         const box = document.createElement('div');
-        box.className = `card-item-box ${typeClass}`;
-        box.onclick = () => showCardDetail(stat);
-        box.title = "Karta tafsilotlarini ko'rish";
+        box.className = `card-item-box ${typeClass} ${isActive ? 'active-source-box' : ''}`;
+        box.onclick = (ev) => {
+          // If clicked specifically on the detail button, don't toggle filter
+          if (ev.target.closest('.card-box-detail-btn')) return;
+          selectSourceFilter(src.id);
+        };
+        box.title = `${src.name} bo'yicha operatsiyalarni filtrlash`;
 
         box.innerHTML = `
           <div class="card-box-top">
             <div class="card-box-name">${icon} ${esc(src.name)}</div>
+            <button type="button" class="card-box-detail-btn" onclick="showCardDetail(${JSON.stringify(stat).replace(/"/g, '&quot;')})" title="Kattaroq ko'rish" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:12px; padding:2px;">🔍</button>
           </div>
           <div class="card-box-balance" style="color:${balColor};">${stat.balance >= 0 ? '+' : ''}${formatNum(stat.balance)}</div>
           <div class="card-box-metrics">
@@ -3316,6 +3646,10 @@
         transferReasonPlaceholder: "Masalan: Naqd pul kartaga, ATM...",
         transferSameSourceError: "Chiqish va qabul manbasi bir xil bo'lmasligi kerak!",
         transferSuccess: "O'tkazma muvaffaqiyatli saqlandi",
+        filterOnlyCash: "Faqat naqd pul operatsiyalari",
+        filterOnlyCards: "Faqat kartalar operatsiyalari",
+        filterOnlySource: "Faqat {name} operatsiyalari",
+        showAllOperations: "✕ Barchasi",
       },
       en: {
         headerTitle: '💰 Finance Tracker',
@@ -3443,6 +3777,10 @@
         transferReasonPlaceholder: "e.g. Cash to card, ATM...",
         transferSameSourceError: "Source and destination cannot be the same!",
         transferSuccess: "Transfer saved successfully",
+        filterOnlyCash: "Only cash transactions",
+        filterOnlyCards: "Only cards transactions",
+        filterOnlySource: "Only {name} transactions",
+        showAllOperations: "✕ Show all",
       }
     };
 
@@ -3928,6 +4266,9 @@
       if (incomeFilterTo) {
         items = items.filter(e => e.date <= incomeFilterTo);
       }
+      if (activeSourceFilter) {
+        items = items.filter(e => entryMatchesSourceFilter(e, activeSourceFilter));
+      }
 
       if (items.length === 0) {
         empty.style.display = 'block';
@@ -4000,6 +4341,9 @@
       }
       if (expenseFilterTo) {
         items = items.filter(e => e.date <= expenseFilterTo);
+      }
+      if (activeSourceFilter) {
+        items = items.filter(e => entryMatchesSourceFilter(e, activeSourceFilter));
       }
 
       if (items.length === 0) {
