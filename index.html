@@ -2307,9 +2307,15 @@
             </button>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label" data-i18n="date">Sana</label>
-          <input type="date" class="form-input" id="incomeDate" required>
+        <div class="form-row" style="display:flex; gap:10px;">
+          <div class="form-group" style="flex:1;">
+            <label class="form-label" data-i18n="date">Sana</label>
+            <input type="date" class="form-input" id="incomeDate" required>
+          </div>
+          <div class="form-group" style="width:130px;">
+            <label class="form-label" data-i18n="time">Vaqt</label>
+            <input type="time" class="form-input" id="incomeTime">
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label" data-i18n="reason">Sabab</label>
@@ -2355,9 +2361,15 @@
           <input type="number" class="form-input" id="debtAmount" placeholder="0" min="0" step="any" inputmode="decimal"
             required>
         </div>
-        <div class="form-group">
-          <label class="form-label" data-i18n="dateGiven">Berilgan sana</label>
-          <input type="date" class="form-input" id="debtDate" required>
+        <div class="form-row" style="display:flex; gap:10px;">
+          <div class="form-group" style="flex:1;">
+            <label class="form-label" data-i18n="dateGiven">Berilgan sana</label>
+            <input type="date" class="form-input" id="debtDate" required>
+          </div>
+          <div class="form-group" style="width:130px;">
+            <label class="form-label" data-i18n="time">Vaqt</label>
+            <input type="time" class="form-input" id="debtTime">
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label" data-i18n="dueDate">Qaytarish muddati (ixtiyoriy)</label>
@@ -2415,9 +2427,15 @@
           <input type="number" class="form-input" id="debtPaymentAmount" placeholder="0" min="0.01" step="any"
             inputmode="decimal" required>
         </div>
-        <div class="form-group">
-          <label class="form-label" data-i18n="paymentDate">To'lov sanasi</label>
-          <input type="date" class="form-input" id="debtPaymentDate" required>
+        <div class="form-row" style="display:flex; gap:10px;">
+          <div class="form-group" style="flex:1;">
+            <label class="form-label" data-i18n="paymentDate">To'lov sanasi</label>
+            <input type="date" class="form-input" id="debtPaymentDate" required>
+          </div>
+          <div class="form-group" style="width:130px;">
+            <label class="form-label" data-i18n="time">Vaqt</label>
+            <input type="time" class="form-input" id="debtPaymentTime">
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label" data-i18n="paymentReceivedTo">Qaysi kartaga / manbaga tushdi?</label>
@@ -2493,9 +2511,15 @@
       <h3 class="modal-title" id="modalExpectedTitle" data-i18n="addExpected">Kutilayotgan kirim qo'shish</h3>
       <form id="formExpected" onsubmit="submitExpected(event)">
         <input type="hidden" id="expectedEditId" value="">
-        <div class="form-group">
-          <label class="form-label" data-i18n="dateExpected">Kutilayotgan sana</label>
-          <input type="date" class="form-input" id="expectedDate" required>
+        <div class="form-row" style="display:flex; gap:10px;">
+          <div class="form-group" style="flex:1;">
+            <label class="form-label" data-i18n="dateExpected">Kutilayotgan sana</label>
+            <input type="date" class="form-input" id="expectedDate" required>
+          </div>
+          <div class="form-group" style="width:130px;">
+            <label class="form-label" data-i18n="time">Vaqt</label>
+            <input type="time" class="form-input" id="expectedTime">
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label" data-i18n="reason">Sabab</label>
@@ -2544,9 +2568,15 @@
           <input type="number" class="form-input" id="transferAmount" placeholder="0" min="0.01" step="any"
             inputmode="decimal" required>
         </div>
-        <div class="form-group">
-          <label class="form-label" data-i18n="date">Sana</label>
-          <input type="date" class="form-input" id="transferDate" required>
+        <div class="form-row" style="display:flex; gap:10px;">
+          <div class="form-group" style="flex:1;">
+            <label class="form-label" data-i18n="date">Sana</label>
+            <input type="date" class="form-input" id="transferDate" required>
+          </div>
+          <div class="form-group" style="width:130px;">
+            <label class="form-label" data-i18n="time">Vaqt</label>
+            <input type="time" class="form-input" id="transferTime">
+          </div>
         </div>
         <div class="form-group">
           <label class="form-label" data-i18n="reason">Izoh (ixtiyoriy)</label>
@@ -3553,6 +3583,7 @@
         income: 'Kirim',
         expense: 'Chiqim',
         date: 'Sana',
+        time: 'Vaqt',
         dateGiven: 'Berilgan sana',
         dateExpected: 'Kutilayotgan sana',
         dueDate: 'Qaytarish muddati (ixtiyoriy)',
@@ -3684,6 +3715,7 @@
         income: 'Income',
         expense: 'Expense',
         date: 'Date',
+        time: 'Time',
         dateGiven: 'Date Given',
         dateExpected: 'Date Expected',
         dueDate: 'Due Date (optional)',
@@ -3894,6 +3926,7 @@
         form.reset();
         document.getElementById('incomeEditId').value = isEdit ? editData.id : '';
         document.getElementById('incomeDate').value = isEdit ? editData.date : todayStr();
+        document.getElementById('incomeTime').value = isEdit ? (editData.time || '') : nowTimeStr();
         document.getElementById('incomeReason').value = isEdit ? editData.reason : '';
         document.getElementById('incomeAmount').value = isEdit ? editData.amount : '';
         if (isEdit && editData.source) document.getElementById('incomeSource').value = editData.source;
@@ -3909,6 +3942,7 @@
         document.getElementById('debtName').value = isEdit ? editData.name : '';
         document.getElementById('debtAmount').value = isEdit ? editData.amount : '';
         document.getElementById('debtDate').value = isEdit ? editData.date : todayStr();
+        document.getElementById('debtTime').value = isEdit ? (editData.time || '') : nowTimeStr();
         document.getElementById('debtDueDate').value = isEdit ? (editData.dueDate || '') : '';
         document.getElementById('debtReason').value = isEdit ? editData.reason : '';
         if (isEdit && editData.source) document.getElementById('debtSource').value = editData.source;
@@ -3922,6 +3956,7 @@
         form.reset();
         document.getElementById('expectedEditId').value = isEdit ? editData.id : '';
         document.getElementById('expectedDate').value = isEdit ? editData.date : todayStr();
+        document.getElementById('expectedTime').value = isEdit ? (editData.time || '') : nowTimeStr();
         document.getElementById('expectedReason').value = isEdit ? editData.reason : '';
         document.getElementById('expectedAmount').value = isEdit ? editData.amount : '';
 
@@ -4130,6 +4165,10 @@
       const d = new Date();
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
+    function nowTimeStr() {
+      const d = new Date();
+      return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    }
     function formatNum(n) {
       return Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
     }
@@ -4138,6 +4177,22 @@
       const parts = str.split('-');
       if (parts.length === 3) return parts[2] + '.' + parts[1] + '.' + parts[0];
       return str;
+    }
+    function formatDateTime(dateStr, timeStr, createdAt) {
+      const datePart = formatDate(dateStr);
+      let timePart = timeStr;
+      if (!timePart && createdAt) {
+        try {
+          const d = new Date(createdAt);
+          if (!isNaN(d.getTime())) {
+            timePart = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+          }
+        } catch(e) {}
+      }
+      if (timePart) {
+        return `${datePart} · <span style="color:var(--text-secondary); font-weight:600;">🕒 ${timePart}</span>`;
+      }
+      return datePart;
     }
     function esc(str) {
       const div = document.createElement('div');
@@ -4200,9 +4255,11 @@
     function submitIncome(e) {
       e.preventDefault();
       const editId = document.getElementById('incomeEditId').value;
+      const timeInp = document.getElementById('incomeTime');
       const entry = {
         type: document.getElementById('typeBtnExpense').classList.contains('active') ? 'expense' : 'income',
         date: document.getElementById('incomeDate').value,
+        time: timeInp && timeInp.value ? timeInp.value : nowTimeStr(),
         reason: document.getElementById('incomeReason').value.trim(),
         amount: parseFloat(document.getElementById('incomeAmount').value),
         source: document.getElementById('incomeSource').value,
@@ -4245,6 +4302,9 @@
       cachedEntries = entries || [];
       cachedEntries.sort((a, b) => {
         if (b.date !== a.date) return b.date.localeCompare(a.date);
+        const timeA = a.time || '';
+        const timeB = b.time || '';
+        if (timeB !== timeA) return timeB.localeCompare(timeA);
         return (b.createdAt || 0) - (a.createdAt || 0);
       });
       renderIncomeOnlyList();
@@ -4295,7 +4355,7 @@
             <div class="entry-icon transfer">🔄</div>
             <div class="entry-info">
               <div class="entry-reason">${reasonHtml}</div>
-              <div class="entry-meta">${formatDate(e.date)} · <span style="color:var(--purple); font-weight:600;">${t('transfer')}</span></div>
+              <div class="entry-meta">${formatDateTime(e.date, e.time, e.createdAt)} · <span style="color:var(--purple); font-weight:600;">${t('transfer')}</span></div>
               <div class="entry-source-transfer">
                 <span>${fromIcon} ${esc(fromName)}</span>
                 <span class="entry-transfer-arrow">➔</span>
@@ -4314,7 +4374,7 @@
             <div class="entry-icon income">📈</div>
             <div class="entry-info">
               <div class="entry-reason">${esc(e.reason)}</div>
-              <div class="entry-meta">${formatDate(e.date)}</div>
+              <div class="entry-meta">${formatDateTime(e.date, e.time, e.createdAt)}</div>
               ${srcBadge}
             </div>
             <div class="entry-amount income">+${formatNum(e.amount)}</div>
@@ -4364,7 +4424,7 @@
           <div class="entry-icon expense">📉</div>
           <div class="entry-info">
             <div class="entry-reason">${esc(e.reason)}</div>
-            <div class="entry-meta">${formatDate(e.date)}</div>
+            <div class="entry-meta">${formatDateTime(e.date, e.time, e.createdAt)}</div>
             ${srcBadge}
           </div>
           <div class="entry-amount expense">-${formatNum(e.amount)}</div>
@@ -4389,6 +4449,7 @@
       const sources = getSources();
       document.getElementById('transferEditId').value = isEdit ? editData.id : '';
       document.getElementById('transferDate').value = isEdit ? editData.date : todayStr();
+      document.getElementById('transferTime').value = isEdit ? (editData.time || '') : nowTimeStr();
       document.getElementById('transferAmount').value = isEdit ? editData.amount : '';
       document.getElementById('transferReason').value = isEdit ? (editData.reason || '') : '';
 
@@ -4422,6 +4483,8 @@
       const toSource = document.getElementById('transferToSource').value;
       const amount = parseFloat(document.getElementById('transferAmount').value);
       const date = document.getElementById('transferDate').value;
+      const timeInp = document.getElementById('transferTime');
+      const time = timeInp && timeInp.value ? timeInp.value : nowTimeStr();
       const reason = document.getElementById('transferReason').value.trim();
 
       if (fromSource === toSource) {
@@ -4439,6 +4502,7 @@
         toSource,
         amount,
         date,
+        time,
         reason
       };
 
@@ -4476,10 +4540,12 @@
       e.preventDefault();
       const editId = document.getElementById('debtEditId').value;
       const dueDate = document.getElementById('debtDueDate').value || null;
+      const debtTimeInp = document.getElementById('debtTime');
       const entry = {
         name: document.getElementById('debtName').value.trim(),
         amount: parseFloat(document.getElementById('debtAmount').value),
         date: document.getElementById('debtDate').value,
+        time: debtTimeInp && debtTimeInp.value ? debtTimeInp.value : nowTimeStr(),
         dueDate: dueDate,
         reason: document.getElementById('debtReason').value.trim(),
         source: document.getElementById('debtSource').value,
@@ -4534,6 +4600,7 @@
       document.getElementById('debtPaymentRemainingVal').textContent = formatNum(remainingAmount);
       document.getElementById('debtPaymentAmount').value = remainingAmount;
       document.getElementById('debtPaymentDate').value = todayStr();
+      document.getElementById('debtPaymentTime').value = nowTimeStr();
       const affectEl = document.getElementById('debtPaymentAffectBalance');
       if (affectEl) affectEl.checked = true;
 
@@ -4552,6 +4619,8 @@
       const debtId = document.getElementById('paymentDebtId').value;
       const amount = parseFloat(document.getElementById('debtPaymentAmount').value);
       const date = document.getElementById('debtPaymentDate').value;
+      const timeInp = document.getElementById('debtPaymentTime');
+      const time = timeInp && timeInp.value ? timeInp.value : nowTimeStr();
       const source = document.getElementById('debtPaymentSource').value;
       const note = document.getElementById('debtPaymentNote').value.trim();
       const affectBalance = document.getElementById('debtPaymentAffectBalance') ? document.getElementById('debtPaymentAffectBalance').checked : true;
@@ -4564,6 +4633,7 @@
         id: generateId(),
         amount: amount,
         date: date,
+        time: time,
         source: source,
         note: note,
         affectBalance: affectBalance,
@@ -4639,6 +4709,7 @@
           id: generateId(),
           amount: remainingAmount,
           date: todayStr(),
+          time: nowTimeStr(),
           source: source,
           note: currentLang === 'uz' ? "To'liq yopildi" : "Fully closed",
           affectBalance: affectBalance,
@@ -4749,6 +4820,9 @@
       filtered.sort((a, b) => {
         if (a.returned !== b.returned) return a.returned ? 1 : -1;
         if (b.date !== a.date) return b.date.localeCompare(a.date);
+        const timeA = a.time || '';
+        const timeB = b.time || '';
+        if (timeB !== timeA) return timeB.localeCompare(timeA);
         return (b.createdAt || 0) - (a.createdAt || 0);
       });
 
@@ -4806,7 +4880,7 @@
               ${d.payments.map(p => `
                 <div class="debt-payment-item">
                   <div class="debt-payment-info">
-                    <span>📅 ${formatDate(p.date)}</span>
+                    <span>📅 ${formatDateTime(p.date, p.time, p.createdAt)}</span>
                     ${getSourceBadge(p.source)}
                     ${p.affectBalance === false ? `<span class="entry-source" style="background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.25); font-size:11px;">🚫 ${t('noBalanceImpact')}</span>` : ''}
                     ${p.note ? `<span style="color:var(--text-muted);">(${esc(p.note)})</span>` : ''}
@@ -4826,7 +4900,7 @@
             <div class="entry-icon ${isFullyReturned ? 'returned' : 'debt'}">${isFullyReturned ? '✅' : '🤝'}</div>
             <div class="entry-info">
               <div class="entry-reason">${esc(d.name)}</div>
-              <div class="entry-meta">${formatDate(d.date)} · ${esc(d.reason)}</div>
+              <div class="entry-meta">${formatDateTime(d.date, d.time, d.createdAt)} · ${esc(d.reason)}</div>
               <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
                 ${srcBadge}
                 ${noAffectBadge}
@@ -4924,8 +4998,10 @@
     function submitExpected(e) {
       e.preventDefault();
       const editId = document.getElementById('expectedEditId').value;
+      const expTimeInp = document.getElementById('expectedTime');
       const entry = {
         date: document.getElementById('expectedDate').value,
+        time: expTimeInp && expTimeInp.value ? expTimeInp.value : nowTimeStr(),
         reason: document.getElementById('expectedReason').value.trim(),
         amount: parseFloat(document.getElementById('expectedAmount').value),
       };
@@ -4962,6 +5038,7 @@
         const incomeEntry = {
           type: 'income',
           date: date,
+          time: nowTimeStr(),
           reason: reason,
           amount: amount,
           source: getSources()[0] ? getSources()[0].id : 'cash'
@@ -4987,6 +5064,9 @@
 
       cachedExpected.sort((a, b) => {
         if (b.date !== a.date) return b.date.localeCompare(a.date);
+        const timeA = a.time || '';
+        const timeB = b.time || '';
+        if (timeB !== timeA) return timeB.localeCompare(timeA);
         return (b.createdAt || 0) - (a.createdAt || 0);
       });
 
@@ -5008,7 +5088,7 @@
           <div class="entry-icon expected">📥</div>
           <div class="entry-info">
             <div class="entry-reason">${esc(item.reason)}</div>
-            <div class="entry-meta">${formatDate(item.date)}</div>
+            <div class="entry-meta">${formatDateTime(item.date, item.time, item.createdAt)}</div>
           </div>
           <div class="entry-amount expected">${formatNum(item.amount)}</div>
           <div class="entry-actions">
