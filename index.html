@@ -2668,35 +2668,21 @@
       </div>
     </section>
 
-    <!-- ===== TAB 3: EXPECTED INCOME ===== -->
-    <section class="tab-content" id="tabExpected">
-      <div class="summary-wrapper">
-        <button class="summary-toggle" id="toggleExpectedSummary" onclick="toggleSummary('expected')"
-          aria-label="Toggle summary">👁</button>
-        <div class="summary-grid cols-1" id="expectedSummaryGrid">
-          <div class="summary-card blue" onclick="showAmountDetail('expected')" title="Kattaroq ko'rish">
-            <div class="summary-label" data-i18n="totalExpected">Kutilayotgan Jami</div>
-            <div class="summary-value" id="totalExpected">0</div>
-          </div>
-        </div>
-      </div>
-      <div class="section-header">
-        <h2 class="section-title" data-i18n="expectedList">Kutilayotgan Kirimlar</h2>
-        <button class="btn-add blue" onclick="openModal('expected')" aria-label="Add expected income">＋</button>
-      </div>
-      <div class="entry-list" id="expectedList"></div>
-      <div class="empty-state" id="expectedEmpty" style="display:none;">
-        <div class="empty-icon">⏳</div>
-        <div class="empty-text" data-i18n="noExpected">Hali kutilayotgan kirimlar yo'q</div>
-      </div>
-    </section>
+
 
     <!-- ===== TAB: ANALYTICS ===== -->
     <section class="tab-content" id="tabAnalytics">
 
       <!-- 1. This Month Summary -->
       <div class="analytics-card blue-accent">
-        <div class="analytics-card-title">📅 Bu oy — <span id="analyticsMonthLabel"></span></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+          <div class="analytics-card-title" style="margin-bottom:0;">📅 Oylik hisobot — <span id="analyticsMonthLabel"></span></div>
+          <div style="display:flex; align-items:center; gap:6px;">
+            <button type="button" class="period-btn" style="padding:4px 8px; border-radius:6px;" onclick="stepAnalyticsMonth(-1)" title="Oldingi oy">◀</button>
+            <input type="month" id="analyticsMonthPicker" class="form-input" style="height:32px; width:auto; font-size:12px; font-weight:700; padding:2px 8px; border-radius:8px; background:var(--bg-card); color:var(--text-primary); border:1px solid var(--border);" onchange="setAnalyticsMonth(this.value)">
+            <button type="button" class="period-btn" style="padding:4px 8px; border-radius:6px;" onclick="stepAnalyticsMonth(1)" title="Keyingi oy">▶</button>
+          </div>
+        </div>
         <div class="monthly-overview-grid">
           <div class="monthly-stat-box">
             <div class="monthly-stat-label">Daromad</div>
@@ -2721,6 +2707,12 @@
           <button class="period-btn" id="piePeriodQuarter" onclick="setPiePeriod('quarter')">3 oy</button>
           <button class="period-btn" id="piePeriodYear" onclick="setPiePeriod('year')">Yil</button>
           <button class="period-btn" id="piePeriodAll" onclick="setPiePeriod('all')">Barchasi</button>
+          <button class="period-btn" id="piePeriodCustom" onclick="setPiePeriod('custom')">Maxsus</button>
+        </div>
+        <div id="pieCustomDateRow" style="display:none; gap:8px; margin-bottom:12px; align-items:center;" class="report-period-selector">
+          <input type="date" class="form-input" id="pieCustomFrom" style="flex:1; height:36px; font-size:13px;" onchange="renderPieChart()">
+          <span style="color:var(--text-muted); font-size:13px">—</span>
+          <input type="date" class="form-input" id="pieCustomTo" style="flex:1; height:36px; font-size:13px;" onchange="renderPieChart()">
         </div>
         <div class="chart-container" style="height:220px;">
           <canvas id="pieChartCanvas"></canvas>
@@ -2775,6 +2767,64 @@
 
     </section>
 
+    <!-- ===== TAB: PLANNING ===== -->
+    <section class="tab-content" id="tabPlanning">
+
+      <!-- Budget Section -->
+      <div class="analytics-card blue-accent" id="budgetCard">
+        <div class="analytics-card-title" style="justify-content:space-between">
+          <span>💰 Oylik budjet</span>
+          <button class="btn-add" style="width:32px; height:32px; font-size:18px; border-radius:10px; background:var(--blue); box-shadow:0 2px 8px var(--blue-glow);" onclick="openBudgetModal()" title="Budjet qo'shish">+</button>
+        </div>
+        <div id="budgetList"><div class="no-data-chart">💳 Hali budjet belgilanmagan</div></div>
+      </div>
+
+      <!-- Savings Goals -->
+      <div class="analytics-card green-accent" id="savingsCard">
+        <div class="analytics-card-title" style="justify-content:space-between">
+          <span>🎯 Jamg'arma maqsadlari</span>
+          <button class="btn-add" style="width:32px; height:32px; font-size:18px; border-radius:10px; background:var(--green); box-shadow:0 2px 8px rgba(34,197,94,0.3);" onclick="openGoalModal()" title="Maqsad qo'shish">+</button>
+        </div>
+        <div id="goalList"><div class="no-data-chart">🎯 Hali maqsad qo'shilmagan</div></div>
+      </div>
+
+      <!-- Recurring Expenses -->
+      <div class="analytics-card purple-accent">
+        <div class="analytics-card-title" style="justify-content:space-between">
+          <span>🔄 Takrorlanuvchi xarajatlar</span>
+          <button class="btn-add" style="width:32px; height:32px; font-size:18px; border-radius:10px; background:var(--purple); box-shadow:0 2px 8px rgba(168,85,247,0.3);" onclick="openRecurringModal()" title="Qo'shish">+</button>
+        </div>
+        <div style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Har oy avtomatik kiritiladi. Oyni boshida "Yaratish" tugmasini bosing.</div>
+        <div id="recurringList"><div class="no-data-chart">🔄 Hali takrorlanuvchi xarajat yo'q</div></div>
+        <button class="btn-submit" id="recurringCreateBtn" style="margin-top:12px; background:linear-gradient(135deg,var(--purple),var(--blue)); display:none;" onclick="createRecurringEntries()">Bu oy uchun yaratish</button>
+      </div>
+
+      <!-- Savings Calculator -->
+      <div class="analytics-card orange-accent">
+        <div class="analytics-card-title">🧠 Maqsad kalkulyatori</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Maqsad summasi (so'm)</label>
+            <input type="number" class="form-input" id="calcTarget" placeholder="10 000 000" inputmode="decimal" oninput="calcSavings()">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Hozirgi jamg'arma (so'm)</label>
+            <input type="number" class="form-input" id="calcCurrent" placeholder="0" inputmode="decimal" oninput="calcSavings()">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Muddat (oy)</label>
+            <input type="number" class="form-input" id="calcMonths" placeholder="12" min="1" inputmode="decimal" oninput="calcSavings()">
+          </div>
+          <div id="calcResult" style="background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; display:none;">
+            <div style="font-size:13px; color:var(--text-muted); margin-bottom:6px;">Oyiga yig'ish kerak:</div>
+            <div id="calcResultValue" style="font-size:24px; font-weight:800; color:var(--green);"></div>
+            <div id="calcResultSub" style="font-size:12px; color:var(--text-muted); margin-top:4px;"></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
   </main>
 
   <!-- BOTTOM NAV -->
@@ -2791,9 +2841,9 @@
       <span class="nav-icon">🤝</span>
       <span class="nav-label" data-i18n="navDebts">Qarzlar</span>
     </button>
-    <button class="nav-item tab-expected" data-tab="tabExpected" onclick="switchTab('tabExpected', this)">
-      <span class="nav-icon">⏳</span>
-      <span class="nav-label" data-i18n="navExpected">Kutilayotgan</span>
+    <button class="nav-item tab-planning" data-tab="tabPlanning" onclick="switchTab('tabPlanning', this); renderPlanning();">
+      <span class="nav-icon">🎯</span>
+      <span class="nav-label">Reja</span>
     </button>
     <button class="nav-item tab-analytics" data-tab="tabAnalytics" onclick="switchTab('tabAnalytics', this); renderAnalytics();">
       <span class="nav-icon">📊</span>
@@ -2912,6 +2962,13 @@
             data-i18n="debtAffectBalanceHint">Belgilansa, qarz berilganda kartadan ayiriladi. Qaytarilganda esa
             tanlangan karta/hisobga har doim qo'shiladi.</small>
         </div>
+        <div class="form-group" id="debtReturnedGroup" style="display:none;">
+          <div class="form-checkbox-row"
+            onclick="event.target.tagName !== 'INPUT' && (document.getElementById('debtReturnedCheckbox').checked = !document.getElementById('debtReturnedCheckbox').checked)">
+            <input type="checkbox" id="debtReturnedCheckbox">
+            <label for="debtReturnedCheckbox" style="color:var(--green); font-weight:700;">✅ Qaytarilgan deb belgilash</label>
+          </div>
+        </div>
         <button type="submit" class="btn-submit orange" id="debtSubmitBtn" data-i18n="add">Qo'shish</button>
         <button type="button" class="btn-cancel" onclick="closeModal('modalDebt')" data-i18n="cancel">Bekor
           qilish</button>
@@ -3016,39 +3073,7 @@
     </div>
   </div>
 
-  <!-- ===== MODAL: ADD/EDIT EXPECTED INCOME ===== -->
-  <div class="modal-overlay" id="modalExpected">
-    <div class="modal">
-      <div class="modal-handle"></div>
-      <h3 class="modal-title" id="modalExpectedTitle" data-i18n="addExpected">Kutilayotgan kirim qo'shish</h3>
-      <form id="formExpected" onsubmit="submitExpected(event)">
-        <input type="hidden" id="expectedEditId" value="">
-        <div class="form-row" style="display:flex; gap:10px;">
-          <div class="form-group" style="flex:1;">
-            <label class="form-label" data-i18n="dateExpected">Kutilayotgan sana</label>
-            <input type="date" class="form-input" id="expectedDate" required>
-          </div>
-          <div class="form-group" style="width:130px;">
-            <label class="form-label" data-i18n="time">Vaqt</label>
-            <input type="time" class="form-input" id="expectedTime">
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label" data-i18n="reason">Sabab</label>
-          <input type="text" class="form-input" id="expectedReason" data-placeholder="expectedReasonPlaceholder"
-            placeholder="Manba / sabab..." required>
-        </div>
-        <div class="form-group">
-          <label class="form-label" data-i18n="amount">Miqdor</label>
-          <input type="number" class="form-input" id="expectedAmount" placeholder="0" min="0" step="any"
-            inputmode="decimal" required>
-        </div>
-        <button type="submit" class="btn-submit blue" id="expectedSubmitBtn" data-i18n="add">Qo'shish</button>
-        <button type="button" class="btn-cancel" onclick="closeModal('modalExpected')" data-i18n="cancel">Bekor
-          qilish</button>
-      </form>
-    </div>
-  </div>
+
 
   <!-- ===== MODAL: TRANSFER (PUL O'TKAZISH) ===== -->
   <div class="modal-overlay" id="modalTransfer">
@@ -4353,7 +4378,6 @@
       renderIncomeOnlyList();
       renderExpenseOnlyList();
       renderDebtList(cachedDebts);
-      renderExpectedList(cachedExpected);
     }
 
     function applyTranslations() {
@@ -4469,6 +4493,13 @@
         document.getElementById('debtReason').value = isEdit ? editData.reason : '';
         if (isEdit && editData.source) document.getElementById('debtSource').value = editData.source;
         document.getElementById('debtAffectBalance').checked = isEdit ? (editData.affectBalance !== false) : true;
+
+        const retGrp = document.getElementById('debtReturnedGroup');
+        const retChk = document.getElementById('debtReturnedCheckbox');
+        if (retGrp && retChk) {
+          retGrp.style.display = isEdit ? 'block' : 'none';
+          retChk.checked = isEdit ? !!editData.returned : false;
+        }
 
         document.getElementById('modalDebtTitle').textContent = t(isEdit ? 'editDebt' : 'addDebt');
         document.getElementById('debtSubmitBtn').textContent = t(isEdit ? 'save' : 'add');
@@ -5116,6 +5147,8 @@
         affectBalance: document.getElementById('debtAffectBalance').checked,
       };
       if (editId) {
+        const retChk = document.getElementById('debtReturnedCheckbox');
+        if (retChk) entry.returned = retChk.checked;
         store.update('debts', editId, entry);
         closeModal('modalDebt');
         showToast(t('toastUpdated'));
@@ -5621,48 +5654,7 @@
     }
 
     function renderExpectedList(items) {
-      cachedExpected = items || [];
-      const list = document.getElementById('expectedList');
-      const empty = document.getElementById('expectedEmpty');
-      list.innerHTML = '';
-
-      cachedExpected.sort((a, b) => {
-        if (b.date !== a.date) return b.date.localeCompare(a.date);
-        const timeA = a.time || '';
-        const timeB = b.time || '';
-        if (timeB !== timeA) return timeB.localeCompare(timeA);
-        return (b.createdAt || 0) - (a.createdAt || 0);
-      });
-
-      if (cachedExpected.length === 0) {
-        empty.style.display = 'block';
-        applyTranslations();
-      } else {
-        empty.style.display = 'none';
-      }
-
-      let total = 0;
-      cachedExpected.forEach(i => { total += i.amount; });
-      document.getElementById('totalExpected').textContent = formatNum(total);
-
-      cachedExpected.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'entry-card';
-        card.innerHTML = `
-          <div class="entry-icon expected">📥</div>
-          <div class="entry-info">
-            <div class="entry-reason">${esc(item.reason)}</div>
-            <div class="entry-meta">${formatDateTime(item.date, item.time, item.createdAt)}</div>
-          </div>
-          <div class="entry-amount expected">${formatNum(item.amount)}</div>
-          <div class="entry-actions">
-            <button class="btn-action check" onclick="markExpectedReceived('${item.id}', ${item.amount}, '${esc(item.reason).replace(/'/g, "\\'")}', '${item.date}')" aria-label="Mark received">✓</button>
-            <button class="btn-action edit" onclick="editExpected('${item.id}')" aria-label="Edit">✏️</button>
-            <button class="btn-action delete" onclick="deleteExpected('${item.id}')" aria-label="Delete">🗑</button>
-          </div>
-        `;
-        list.appendChild(card);
-      });
+      // Kutilayotgan kirimlar butunlay olib tashlangan
     }
 
     // =============================================
@@ -5711,7 +5703,6 @@
     // =============================================
     store.on('entries', renderIncomeList);
     store.on('debts', renderDebtList);
-    store.on('expected', renderExpectedList);
 
     // =============================================
     // ANALYTICS LOGIC
@@ -5722,10 +5713,12 @@
 
     function setPiePeriod(p) {
       piePeriod = p;
-      ['month','quarter','year','all'].forEach(id => {
+      ['month','quarter','year','all','custom'].forEach(id => {
         const btn = document.getElementById('piePeriod' + id.charAt(0).toUpperCase() + id.slice(1));
         if (btn) btn.classList.toggle('active', id === p);
       });
+      const customRow = document.getElementById('pieCustomDateRow');
+      if (customRow) customRow.style.display = p === 'custom' ? 'flex' : 'none';
       renderPieChart();
     }
 
@@ -5740,14 +5733,45 @@
       return months[month - 1] + ' ' + year;
     }
 
+    let selectedAnalyticsMonth = '';
+
+    function getSelectedAnalyticsMonth() {
+      if (selectedAnalyticsMonth) return selectedAnalyticsMonth;
+      const now = new Date();
+      return now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+    }
+
+    function setAnalyticsMonth(val) {
+      if (!val) return;
+      selectedAnalyticsMonth = val;
+      renderMonthSummary();
+      if (piePeriod === 'month') renderPieChart();
+    }
+
+    function stepAnalyticsMonth(delta) {
+      const cur = getSelectedAnalyticsMonth();
+      const [y, m] = cur.split('-').map(Number);
+      const newDate = new Date(y, m - 1 + delta, 1);
+      selectedAnalyticsMonth = newDate.getFullYear() + '-' + String(newDate.getMonth() + 1).padStart(2, '0');
+      const picker = document.getElementById('analyticsMonthPicker');
+      if (picker) picker.value = selectedAnalyticsMonth;
+      renderMonthSummary();
+      if (piePeriod === 'month') renderPieChart();
+    }
+
     function filterEntriesByPeriod(period) {
       const now = new Date();
       const curYear = now.getFullYear();
       const curMonth = now.getMonth() + 1;
       let fromDate = '';
+      let toDate = '';
 
       if (period === 'month') {
-        fromDate = curYear + '-' + String(curMonth).padStart(2,'0') + '-01';
+        const ym = getSelectedAnalyticsMonth();
+        const [y, m] = ym.split('-').map(Number);
+        fromDate = ym + '-01';
+        const lastDay = new Date(y, m, 0).getDate();
+        toDate = ym + '-' + String(lastDay).padStart(2, '0');
       } else if (period === 'quarter') {
         const qStart = curMonth - 2;
         const qYear = qStart <= 0 ? curYear - 1 : curYear;
@@ -5755,11 +5779,15 @@
         fromDate = qYear + '-' + String(qMonth).padStart(2,'0') + '-01';
       } else if (period === 'year') {
         fromDate = curYear + '-01-01';
+      } else if (period === 'custom') {
+        fromDate = (document.getElementById('pieCustomFrom') || {}).value || '';
+        toDate = (document.getElementById('pieCustomTo') || {}).value || '';
       }
 
       return cachedEntries.filter(e => {
         if (e.type !== 'expense') return false;
         if (fromDate && e.date < fromDate) return false;
+        if (toDate && e.date > toDate) return false;
         return true;
       });
     }
@@ -5960,13 +5988,14 @@
     }
 
     function renderMonthSummary() {
-      const now = new Date();
-      const curYear = now.getFullYear();
-      const curMonth = now.getMonth() + 1;
-      const prefix = curYear + '-' + String(curMonth).padStart(2,'0');
+      const prefix = getSelectedAnalyticsMonth();
+      const [curYear, curMonth] = prefix.split('-').map(Number);
       const prevMonth = curMonth === 1 ? 12 : curMonth - 1;
       const prevYear = curMonth === 1 ? curYear - 1 : curYear;
       const prevPrefix = prevYear + '-' + String(prevMonth).padStart(2,'0');
+
+      const picker = document.getElementById('analyticsMonthPicker');
+      if (picker && picker.value !== prefix) picker.value = prefix;
 
       let monthIncome = 0, monthExpense = 0;
       let prevExpense = 0;
@@ -6132,6 +6161,410 @@
       renderMonthSummary();
       renderPieChart();
       renderBarChart();
+    }
+
+    // =============================================
+    // PLANNING SYSTEM (Budget, Goals, Recurring)
+    // =============================================
+
+    function getPlanningData(key) {
+      try { return JSON.parse(localStorage.getItem('fin_' + key) || '[]'); } catch(e) { return []; }
+    }
+    function setPlanningData(key, data) {
+      localStorage.setItem('fin_' + key, JSON.stringify(data));
+    }
+
+    // --- BUDGET ---
+    function openBudgetModal(editIndex) {
+      const budgets = getPlanningData('budgets');
+      const isEdit = editIndex !== undefined;
+      const b = isEdit ? budgets[editIndex] : null;
+      const existingModal = document.getElementById('modalBudget');
+      if (existingModal) existingModal.remove();
+
+      const modal = document.createElement('div');
+      modal.id = 'modalBudget';
+      modal.className = 'modal-overlay active';
+      modal.innerHTML = `
+        <div class="modal">
+          <div class="modal-handle"></div>
+          <h3 class="modal-title">${isEdit ? 'Budjetni tahrirlash' : "Budjet qo'shish"}</h3>
+          <div class="form-group">
+            <label class="form-label">Kategoriya nomi</label>
+            <input type="text" class="form-input" id="budgetName" placeholder="Masalan: Oziq-ovqat" value="${isEdit ? esc(b.name) : ''}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Oylik limit (so'm)</label>
+            <input type="number" class="form-input" id="budgetLimit" placeholder="1 500 000" min="0" inputmode="decimal" value="${isEdit ? b.limit : ''}" required>
+          </div>
+          <button type="button" class="btn-submit blue" onclick="saveBudget(${isEdit ? editIndex : 'null'})">${isEdit ? 'Saqlash' : "Qo'shish"}</button>
+          <button type="button" class="btn-cancel" onclick="document.getElementById('modalBudget').remove()">Bekor qilish</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      setTimeout(() => document.getElementById('budgetName').focus(), 100);
+    }
+
+    function saveBudget(editIndex) {
+      const name = document.getElementById('budgetName').value.trim();
+      const limit = parseFloat(document.getElementById('budgetLimit').value);
+      if (!name || !limit) return;
+      const budgets = getPlanningData('budgets');
+      const obj = { name, limit };
+      if (editIndex !== null && editIndex !== undefined) {
+        budgets[editIndex] = obj;
+      } else {
+        budgets.push(obj);
+      }
+      setPlanningData('budgets', budgets);
+      document.getElementById('modalBudget').remove();
+      renderBudgets();
+    }
+
+    function deleteBudget(i) {
+      showConfirm('Budjetni o\'chirasizmi?', true, () => {
+        const budgets = getPlanningData('budgets');
+        budgets.splice(i, 1);
+        setPlanningData('budgets', budgets);
+        renderBudgets();
+      });
+    }
+
+    function renderBudgets() {
+      const budgets = getPlanningData('budgets');
+      const container = document.getElementById('budgetList');
+      if (!container) return;
+
+      if (budgets.length === 0) {
+        container.innerHTML = '<div class="no-data-chart">💳 Hali budjet belgilanmagan</div>';
+        return;
+      }
+
+      const now = new Date();
+      const prefix = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2,'0');
+      const spent = {};
+      cachedEntries.forEach(e => {
+        if (e.type !== 'expense' || !e.date || !e.date.startsWith(prefix)) return;
+        const key = (e.reason || '').trim().toLowerCase();
+        budgets.forEach((b, i) => {
+          if (key.includes(b.name.toLowerCase()) || b.name.toLowerCase().includes(key)) {
+            if (!spent[i]) spent[i] = 0;
+            spent[i] += e.amount || 0;
+          }
+        });
+      });
+
+      container.innerHTML = '';
+      budgets.forEach((b, i) => {
+        const usedRaw = spent[i] || 0;
+        const pct = Math.min(100, Math.round((usedRaw / b.limit) * 100));
+        const remaining = b.limit - usedRaw;
+        const color = pct >= 90 ? 'var(--red)' : pct >= 70 ? 'var(--orange)' : 'var(--green)';
+        const warning = pct >= 90 ? `<div style="color:var(--orange); font-size:11px; margin-top:4px;">\u26A0\uFE0F Budjetning ${pct}% ishlatildi!</div>` : '';
+
+        const item = document.createElement('div');
+        item.style.cssText = 'border-bottom:1px solid rgba(255,255,255,0.05); padding:12px 0;';
+        item.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div>
+              <div style="font-size:14px; font-weight:700; color:var(--text);">${esc(b.name)}</div>
+              <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${formatNum(usedRaw)} / ${formatNum(b.limit)} so'm</div>
+              ${warning}
+            </div>
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-size:15px; font-weight:800; color:${color};">${pct}%</span>
+              <button class="btn-action edit" onclick="openBudgetModal(${i})" style="width:28px; height:28px;">✏️</button>
+              <button class="btn-action delete" onclick="deleteBudget(${i})" style="width:28px; height:28px;">🗑</button>
+            </div>
+          </div>
+          <div style="height:8px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden;">
+            <div style="height:100%; width:${pct}%; background:${color}; border-radius:4px; transition:width 0.5s ease;"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-top:5px;">
+            <span>Sarflangan: ${formatShortNum(usedRaw)}</span>
+            <span>Qoldi: ${remaining >= 0 ? formatShortNum(remaining) : '<span style="color:var(--red)">-'+formatShortNum(-remaining)+'</span>'}</span>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // --- SAVINGS GOALS ---
+    function openGoalModal(editIndex) {
+      const goals = getPlanningData('goals');
+      const isEdit = editIndex !== undefined;
+      const g = isEdit ? goals[editIndex] : null;
+      const existingModal = document.getElementById('modalGoal');
+      if (existingModal) existingModal.remove();
+
+      const modal = document.createElement('div');
+      modal.id = 'modalGoal';
+      modal.className = 'modal-overlay active';
+      modal.innerHTML = `
+        <div class="modal">
+          <div class="modal-handle"></div>
+          <h3 class="modal-title">${isEdit ? 'Maqsadni tahrirlash' : "Maqsad qo'shish"}</h3>
+          <div class="form-group">
+            <label class="form-label">Maqsad nomi</label>
+            <input type="text" class="form-input" id="goalName" placeholder="Masalan: Telefon" value="${isEdit ? esc(g.name) : ''}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Maqsad summasi (so'm)</label>
+            <input type="number" class="form-input" id="goalTarget" placeholder="8 000 000" min="0" inputmode="decimal" value="${isEdit ? g.target : ''}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Yig'ilgan summa (so'm)</label>
+            <input type="number" class="form-input" id="goalCurrent" placeholder="0" min="0" inputmode="decimal" value="${isEdit ? g.current : 0}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Muddat (ixtiyoriy)</label>
+            <input type="date" class="form-input" id="goalDeadline" value="${isEdit && g.deadline ? g.deadline : ''}">
+          </div>
+          <button type="button" class="btn-submit green" onclick="saveGoal(${isEdit ? editIndex : 'null'})">${isEdit ? 'Saqlash' : "Qo'shish"}</button>
+          <button type="button" class="btn-cancel" onclick="document.getElementById('modalGoal').remove()">Bekor qilish</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      setTimeout(() => document.getElementById('goalName').focus(), 100);
+    }
+
+    function saveGoal(editIndex) {
+      const name = document.getElementById('goalName').value.trim();
+      const target = parseFloat(document.getElementById('goalTarget').value) || 0;
+      const current = parseFloat(document.getElementById('goalCurrent').value) || 0;
+      const deadline = document.getElementById('goalDeadline').value || '';
+      if (!name) return;
+      const goals = getPlanningData('goals');
+      const obj = { name, target, current, deadline };
+      if (editIndex !== null && editIndex !== undefined) {
+        goals[editIndex] = obj;
+      } else {
+        goals.push(obj);
+      }
+      setPlanningData('goals', goals);
+      document.getElementById('modalGoal').remove();
+      renderGoals();
+    }
+
+    function deleteGoal(i) {
+      showConfirm('Maqsadni o\'chirasizmi?', true, () => {
+        const goals = getPlanningData('goals');
+        goals.splice(i, 1);
+        setPlanningData('goals', goals);
+        renderGoals();
+      });
+    }
+
+    function updateGoalAmount(i, delta) {
+      const goals = getPlanningData('goals');
+      if (!goals[i]) return;
+      goals[i].current = Math.max(0, (goals[i].current || 0) + delta);
+      setPlanningData('goals', goals);
+      renderGoals();
+    }
+
+    function renderGoals() {
+      const goals = getPlanningData('goals');
+      const container = document.getElementById('goalList');
+      if (!container) return;
+
+      if (goals.length === 0) {
+        container.innerHTML = '<div class="no-data-chart">🎯 Hali maqsad qo\'shilmagan</div>';
+        return;
+      }
+
+      container.innerHTML = '';
+      goals.forEach((g, i) => {
+        const pct = g.target > 0 ? Math.min(100, Math.round((g.current / g.target) * 100)) : 0;
+        const color = pct >= 100 ? 'var(--green)' : pct >= 50 ? 'var(--blue)' : 'var(--orange)';
+        const remaining = Math.max(0, g.target - g.current);
+        let deadlineHtml = '';
+        if (g.deadline) {
+          const daysLeft = Math.ceil((new Date(g.deadline) - new Date(todayStr())) / 86400000);
+          const monthsLeft = Math.max(1, Math.round(daysLeft / 30));
+          const perMonth = monthsLeft > 0 ? remaining / monthsLeft : remaining;
+          deadlineHtml = `<div style="font-size:11px; color:var(--text-muted); margin-top:4px;">\uD83D\uDCC5 ${formatDate(g.deadline)} \u00b7 Oyiga: ${formatShortNum(perMonth)}</div>`;
+        }
+
+        const item = document.createElement('div');
+        item.style.cssText = 'border-bottom:1px solid rgba(255,255,255,0.05); padding:12px 0;';
+        item.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+            <div style="flex:1; min-width:0;">
+              <div style="font-size:14px; font-weight:700; color:var(--text);">${pct >= 100 ? '✅ ' : '🎯 '}${esc(g.name)}</div>
+              <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">${formatShortNum(g.current)} / ${formatShortNum(g.target)}</div>
+              ${deadlineHtml}
+            </div>
+            <div style="display:flex; align-items:center; gap:4px; flex-shrink:0;">
+              <span style="font-size:15px; font-weight:800; color:${color};">${pct}%</span>
+              <button class="btn-action edit" onclick="openGoalModal(${i})" style="width:28px; height:28px;">✏️</button>
+              <button class="btn-action delete" onclick="deleteGoal(${i})" style="width:28px; height:28px;">🗑</button>
+            </div>
+          </div>
+          <div style="height:10px; background:rgba(255,255,255,0.08); border-radius:5px; overflow:hidden; margin-bottom:6px;">
+            <div style="height:100%; width:${pct}%; background:${color}; border-radius:5px; transition:width 0.5s ease;"></div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button style="flex:1; height:32px; border-radius:8px; border:1px solid var(--border); background:var(--bg-input); color:var(--green); font-weight:700; cursor:pointer; font-family:inherit;" onclick="updateGoalAmount(${i}, ${Math.round(g.target * 0.1) || 100000})">+${formatShortNum(Math.round(g.target * 0.1) || 100000)}</button>
+            <button style="flex:1; height:32px; border-radius:8px; border:1px solid var(--border); background:var(--bg-input); color:var(--text-muted); font-weight:700; cursor:pointer; font-family:inherit;" onclick="openGoalModal(${i})">Yangilash</button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // --- RECURRING EXPENSES ---
+    function openRecurringModal(editIndex) {
+      const recurrings = getPlanningData('recurring');
+      const isEdit = editIndex !== undefined;
+      const r = isEdit ? recurrings[editIndex] : null;
+      const existingModal = document.getElementById('modalRecurring');
+      if (existingModal) existingModal.remove();
+
+      const sourcesHtml = getSources().map(s => `<option value="${s.id}" ${isEdit && r.source === s.id ? 'selected' : ''}>${esc(s.name)}</option>`).join('');
+
+      const modal = document.createElement('div');
+      modal.id = 'modalRecurring';
+      modal.className = 'modal-overlay active';
+      modal.innerHTML = `
+        <div class="modal">
+          <div class="modal-handle"></div>
+          <h3 class="modal-title">${isEdit ? 'Takrorlanuvchini tahrirlash' : "Takrorlanuvchi xarajat qo'shish"}</h3>
+          <div class="form-group">
+            <label class="form-label">Nomi / sababi</label>
+            <input type="text" class="form-input" id="recurringName" placeholder="Masalan: Internet" value="${isEdit ? esc(r.name) : ''}" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Miqdor (so'm)</label>
+            <input type="number" class="form-input" id="recurringAmount" placeholder="300 000" min="0" inputmode="decimal" value="${isEdit ? r.amount : ''}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Manba</label>
+            <select class="form-input form-select" id="recurringSource">${sourcesHtml}</select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Har oy nechinchi kuni</label>
+            <input type="number" class="form-input" id="recurringDay" placeholder="1" min="1" max="31" inputmode="decimal" value="${isEdit ? r.day : 1}">
+          </div>
+          <button type="button" class="btn-submit" style="background:var(--purple);" onclick="saveRecurring(${isEdit ? editIndex : 'null'})">${isEdit ? 'Saqlash' : "Qo'shish"}</button>
+          <button type="button" class="btn-cancel" onclick="document.getElementById('modalRecurring').remove()">Bekor qilish</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      setTimeout(() => document.getElementById('recurringName').focus(), 100);
+    }
+
+    function saveRecurring(editIndex) {
+      const name = document.getElementById('recurringName').value.trim();
+      const amount = parseFloat(document.getElementById('recurringAmount').value) || 0;
+      const source = document.getElementById('recurringSource').value;
+      const day = parseInt(document.getElementById('recurringDay').value) || 1;
+      if (!name || !amount) return;
+      const recurrings = getPlanningData('recurring');
+      const obj = { name, amount, source, day };
+      if (editIndex !== null && editIndex !== undefined) {
+        recurrings[editIndex] = obj;
+      } else {
+        recurrings.push(obj);
+      }
+      setPlanningData('recurring', recurrings);
+      document.getElementById('modalRecurring').remove();
+      renderRecurring();
+    }
+
+    function deleteRecurring(i) {
+      showConfirm('O\'chirasizmi?', true, () => {
+        const recurrings = getPlanningData('recurring');
+        recurrings.splice(i, 1);
+        setPlanningData('recurring', recurrings);
+        renderRecurring();
+      });
+    }
+
+    function createRecurringEntries() {
+      const recurrings = getPlanningData('recurring');
+      if (recurrings.length === 0) return;
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      let created = 0;
+
+      recurrings.forEach(r => {
+        const day = Math.min(r.day, new Date(year, month, 0).getDate());
+        const dateStr = year + '-' + String(month).padStart(2,'0') + '-' + String(day).padStart(2,'0');
+        // Check if already created this month
+        const alreadyExists = cachedEntries.some(e =>
+          e.type === 'expense' && e.reason === r.name && e.date === dateStr && e.amount === r.amount
+        );
+        if (!alreadyExists) {
+          store.push('entries', {
+            type: 'expense',
+            date: dateStr,
+            time: nowTimeStr(),
+            reason: r.name,
+            amount: r.amount,
+            source: r.source
+          });
+          created++;
+        }
+      });
+      showToast(created > 0 ? `${created} ta xarajat yaratildi ✅` : 'Bu oy allaqachon yaratilgan');
+    }
+
+    function renderRecurring() {
+      const recurrings = getPlanningData('recurring');
+      const container = document.getElementById('recurringList');
+      const createBtn = document.getElementById('recurringCreateBtn');
+      if (!container) return;
+
+      if (recurrings.length === 0) {
+        container.innerHTML = '<div class="no-data-chart">🔄 Hali takrorlanuvchi xarajat yo\'q</div>';
+        if (createBtn) createBtn.style.display = 'none';
+        return;
+      }
+
+      if (createBtn) createBtn.style.display = 'block';
+      container.innerHTML = '';
+      recurrings.forEach((r, i) => {
+        const item = document.createElement('div');
+        item.style.cssText = 'display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05); gap:10px;';
+        item.innerHTML = `
+          <div style="flex:1; min-width:0;">
+            <div style="font-size:14px; font-weight:700; color:var(--text);">${esc(r.name)}</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:2px;">Har oy ${r.day}-kuni · ${getSourceName(r.source)}</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+            <span style="font-size:14px; font-weight:800; color:var(--red);">-${formatShortNum(r.amount)}</span>
+            <button class="btn-action edit" onclick="openRecurringModal(${i})" style="width:28px; height:28px;">✏️</button>
+            <button class="btn-action delete" onclick="deleteRecurring(${i})" style="width:28px; height:28px;">🗑</button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // --- SAVINGS CALCULATOR ---
+    function calcSavings() {
+      const target = parseFloat(document.getElementById('calcTarget')?.value) || 0;
+      const current = parseFloat(document.getElementById('calcCurrent')?.value) || 0;
+      const months = parseInt(document.getElementById('calcMonths')?.value) || 0;
+      const resultEl = document.getElementById('calcResult');
+      const valEl = document.getElementById('calcResultValue');
+      const subEl = document.getElementById('calcResultSub');
+
+      if (!target || !months) { if (resultEl) resultEl.style.display = 'none'; return; }
+
+      const needed = Math.max(0, target - current);
+      const perMonth = needed / months;
+      if (resultEl) resultEl.style.display = 'block';
+      if (valEl) valEl.textContent = formatNum(Math.round(perMonth)) + " so\u2019m";
+      if (subEl) subEl.textContent = "Jami kerak: " + formatNum(needed) + " so\u2019m \u00b7 " + months + " oyda yetasiz";
+    }
+
+    function renderPlanning() {
+      renderBudgets();
+      renderGoals();
+      renderRecurring();
     }
 
     // =============================================
