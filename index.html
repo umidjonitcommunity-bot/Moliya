@@ -651,6 +651,106 @@
       box-shadow: 0 4px 16px var(--blue-glow);
     }
 
+    
+    /* ===== QUICK ACTIONS (HOME) ===== */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 16px 0 20px;
+    }
+
+    .quick-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 4px;
+      cursor: pointer;
+      transition: var(--transition);
+      color: var(--text);
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quick-btn:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(255, 255, 255, 0.16);
+      transform: translateY(-2px);
+    }
+
+    .quick-btn:active {
+      transform: scale(0.96);
+    }
+
+    .quick-btn-icon {
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .quick-btn-text {
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* ===== RECENT SECTION (HOME) ===== */
+    .recent-section {
+      margin-top: 10px;
+      margin-bottom: 24px;
+    }
+
+    .recent-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .recent-section-title {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+    }
+
+    /* ===== AMOUNT MODAL STATS ===== */
+    .amount-modal-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 14px 0;
+      width: 100%;
+    }
+
+    .amount-stat-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    .amount-stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .amount-stat-value {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
     /* ===== ENTRY LIST ===== */
     .entry-list {
       display: flex;
@@ -1485,6 +1585,10 @@
 
     .nav-item.active::before {
       width: 32px;
+    }
+
+    .nav-item.active.tab-home::before {
+      background: #60a5fa;
     }
 
     .nav-item.active.tab-income::before {
@@ -2487,37 +2591,38 @@
   <main class="main">
 
     <!-- ===== TAB 1: INCOME / EXPENSE & BALANCES ===== -->
-    <section class="tab-content active" id="tabIncome">
+    <!-- ===== TAB 0: ASOSIY OYNA (HOME / DASHBOARD) ===== -->
+    <section class="tab-content active" id="tabHome">
       <div class="summary-wrapper">
-        <button class="summary-toggle" id="toggleIncomeSummary" onclick="toggleSummary('income')"
+        <button class="summary-toggle" id="toggleHomeSummary" onclick="toggleSummary('home')"
           aria-label="Toggle summary">👁</button>
 
-        <!-- Row 1: Grand Total, Cash Balance, Cards Balance -->
-        <div class="summary-grid main-balances" id="incomeSummaryGrid">
-          <div class="summary-card grand-total selectable-filter" id="cardGrandTotal" onclick="handleCardClick('grandTotal')" title="Barcha operatsiyalar / Jami">
+        <!-- Asosiy Balanslar: Jami Balans, Naqd Balans, Kartalar Jamisi -->
+        <div class="summary-grid main-balances" id="homeSummaryGrid">
+          <div class="summary-card grand-total selectable-filter" id="cardGrandTotal" onclick="showAmountDetail('grandTotal')" title="Katta oynada to'liq ko'rish">
             <div class="summary-label" data-i18n="grandTotal">👑 Jami Balans</div>
             <div class="summary-value" id="grandTotal">0</div>
           </div>
-          <div class="summary-card teal selectable-filter" id="cardCashBalance" onclick="handleCardClick('cashBalance')" title="Naqd pul bo'yicha filtrlash">
+          <div class="summary-card teal selectable-filter" id="cardCashBalance" onclick="showAmountDetail('cashBalance')" title="Katta oynada to'liq ko'rish">
             <div class="summary-label" data-i18n="cashBalance">💵 Naqd Balans</div>
             <div class="summary-value" id="cashBalance">0</div>
           </div>
-          <div class="summary-card blue selectable-filter" id="cardCardsBalance" onclick="handleCardClick('cardsBalance')" title="Kartalar bo'yicha filtrlash">
-            <div class="summary-label" data-i18n="cardsBalance">💳 Kartalar</div>
+          <div class="summary-card blue selectable-filter" id="cardCardsBalance" onclick="showAmountDetail('cardsBalance')" title="Katta oynada to'liq ko'rish">
+            <div class="summary-label" data-i18n="cardsBalance">💳 Kartalar Jamisi</div>
             <div class="summary-value" id="cardsBalance">0</div>
           </div>
         </div>
 
-        <!-- Row 2: Total Income -->
-        <div class="summary-grid cols-1" id="incomeExpenseGrid">
-          <div class="summary-card green" onclick="showAmountDetail('income')" title="Kattaroq ko'rish">
+        <!-- Umumiy Kirim -->
+        <div class="summary-grid cols-1" id="homeIncomeGrid" style="margin-top:10px;">
+          <div class="summary-card green selectable-filter" id="cardHomeTotalIncome" onclick="showAmountDetail('income')" title="Katta oynada to'liq ko'rish">
             <div class="summary-label" data-i18n="totalIncome">📈 Umumiy Kirim</div>
-            <div class="summary-value" id="totalIncome">0</div>
+            <div class="summary-value" id="totalIncomeHome">0</div>
           </div>
         </div>
       </div>
 
-      <!-- ===== CARDS & ACCOUNTS SECTION ===== -->
+      <!-- ===== KARTALAR VA HAMYONLAR BO'LIMI ===== -->
       <div class="cards-section">
         <div class="cards-section-header">
           <div class="cards-section-title">
@@ -2539,6 +2644,61 @@
           </div>
         </div>
         <div class="cards-grid" id="cardsBarContainer"></div>
+      </div>
+
+      <!-- ===== TEZKOR AMALLAR ===== -->
+      <div class="quick-actions">
+        <button type="button" class="quick-btn" onclick="openModal('income')" title="Kirim qo'shish">
+          <span class="quick-btn-icon" style="color:var(--green)">📈</span>
+          <span class="quick-btn-text" data-i18n="quickIncome">+ Kirim</span>
+        </button>
+        <button type="button" class="quick-btn" onclick="openModal('expense')" title="Chiqim qilish">
+          <span class="quick-btn-icon" style="color:var(--red)">📉</span>
+          <span class="quick-btn-text" data-i18n="quickExpense">- Chiqim</span>
+        </button>
+        <button type="button" class="quick-btn" onclick="openTransferModal()" title="O'tkazma">
+          <span class="quick-btn-icon" style="color:var(--purple)">🔄</span>
+          <span class="quick-btn-text" data-i18n="quickTransfer">O'tkazma</span>
+        </button>
+        <button type="button" class="quick-btn" onclick="openDebtModal()" title="Qarz yozish">
+          <span class="quick-btn-icon" style="color:var(--orange)">🤝</span>
+          <span class="quick-btn-text" data-i18n="quickDebt">Qarz</span>
+        </button>
+      </div>
+
+      <!-- ===== SO'NGGI OPERATSIYALAR ===== -->
+      <div class="recent-section">
+        <div class="recent-section-header">
+          <div class="recent-section-title">
+            <span>🕒</span>
+            <span data-i18n="recentActivity">So'nggi operatsiyalar</span>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button type="button" class="btn-text-action" style="font-size:12px; padding:5px 9px;" onclick="switchTabById('tabIncome')">
+              <span>📈 Kirimlar</span>
+            </button>
+            <button type="button" class="btn-text-action" style="font-size:12px; padding:5px 9px;" onclick="switchTabById('tabExpense')">
+              <span>📉 Chiqimlar</span>
+            </button>
+          </div>
+        </div>
+        <div class="entry-list" id="recentHomeList"></div>
+      </div>
+    </section>
+
+    <!-- ===== TAB 1: KIRIMLAR (ALOHIDA OYNA) ===== -->
+    <section class="tab-content" id="tabIncome">
+      <div class="summary-wrapper">
+        <button class="summary-toggle" id="toggleIncomeSummary" onclick="toggleSummary('income')"
+          aria-label="Toggle summary">👁</button>
+
+        <!-- Kirimlar balansi -->
+        <div class="summary-grid cols-1" id="incomeSummaryGrid">
+          <div class="summary-card green" onclick="showAmountDetail('income')" title="Katta oynada to'liq ko'rish">
+            <div class="summary-label" data-i18n="totalIncome">📈 Umumiy Kirim</div>
+            <div class="summary-value" id="totalIncome">0</div>
+          </div>
+        </div>
       </div>
 
       <!-- Active Source / Card Filter Banner (Income Tab) -->
@@ -2573,7 +2733,6 @@
       </div>
     </section>
 
-    <!-- ===== TAB: EXPENSES ===== -->
     <section class="tab-content" id="tabExpense">
       <div class="summary-wrapper">
         <div class="summary-grid cols-1">
@@ -2829,7 +2988,11 @@
 
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav" id="bottomNav">
-    <button class="nav-item active tab-income" data-tab="tabIncome" onclick="switchTab('tabIncome', this)">
+    <button class="nav-item active tab-home" data-tab="tabHome" onclick="switchTab('tabHome', this)">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label" data-i18n="navHome">Asosiy</span>
+    </button>
+    <button class="nav-item tab-income" data-tab="tabIncome" onclick="switchTab('tabIncome', this)">
       <span class="nav-icon">📈</span>
       <span class="nav-label" data-i18n="navIncomeOnly">Kirimlar</span>
     </button>
@@ -2843,11 +3006,11 @@
     </button>
     <button class="nav-item tab-planning" data-tab="tabPlanning" onclick="switchTab('tabPlanning', this); renderPlanning();">
       <span class="nav-icon">🎯</span>
-      <span class="nav-label">Reja</span>
+      <span class="nav-label" data-i18n="navPlanning">Reja</span>
     </button>
     <button class="nav-item tab-analytics" data-tab="tabAnalytics" onclick="switchTab('tabAnalytics', this); renderAnalytics();">
       <span class="nav-icon">📊</span>
-      <span class="nav-label">Tahlil</span>
+      <span class="nav-label" data-i18n="navAnalytics">Tahlil</span>
     </button>
   </nav>
 
@@ -3193,12 +3356,18 @@
           <div class="amount-modal-hint" id="amountModalHint" data-i18n="tapToCopyHint">Nusxa olish uchun bosing yoki
             quyidagi tugmadan foydalaning</div>
         </div>
-        <div class="amount-modal-actions">
-          <button type="button" class="btn-submit blue" id="btnCopyAmount" onclick="copyDetailAmount()">
-            <span id="copyAmountText" data-i18n="copy">📋 Nusxa olish</span>
-          </button>
-          <button type="button" class="btn-cancel" style="margin-top:0;" onclick="closeModal('modalAmountDetail')"
-            data-i18n="close">Yopish</button>
+        <!-- Qo'shimcha tahlil va statistika -->
+        <div class="amount-modal-stats" id="amountModalStats"></div>
+
+        <div class="amount-modal-actions" style="margin-top:14px; display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; gap:8px; width:100%;">
+            <button type="button" class="btn-submit blue" id="btnCopyAmount" onclick="copyDetailAmount()" style="flex:1;">
+              <span id="copyAmountText" data-i18n="copy">📋 Nusxa olish</span>
+            </button>
+            <button type="button" class="btn-cancel" style="margin-top:0; flex:1;" onclick="closeModal('modalAmountDetail')"
+              data-i18n="close">Yopish</button>
+          </div>
+          <div id="amountModalDynamicActions" style="display:flex; gap:8px; width:100%;"></div>
         </div>
       </div>
     </div>
@@ -3913,6 +4082,9 @@
 
       // Render Filter banner state
       updateSourceFilterBanner();
+
+      // Realtime update open detail modal if active
+      updateActiveDetailModal();
     }
 
     // =============================================
@@ -3945,10 +4117,19 @@
     }
 
     function updateIncomeExpenseDisplay() {
+      const totalIncFiltered = calculateFilteredIncome();
       const totalIncomeEl = document.getElementById('totalIncome');
       if (totalIncomeEl) {
-        totalIncomeEl.textContent = formatNum(calculateFilteredIncome());
+        totalIncomeEl.textContent = formatNum(totalIncFiltered);
       }
+
+      // Home total income shows overall grand income across all history
+      const totalIncomeHomeEl = document.getElementById('totalIncomeHome');
+      if (totalIncomeHomeEl) {
+        const grandInc = calculateFilteredIncome(cachedEntries, '', '');
+        totalIncomeHomeEl.textContent = '+' + formatNum(grandInc);
+      }
+
       const totalExpenseEl = document.getElementById('totalExpense');
       if (totalExpenseEl) {
         totalExpenseEl.textContent = formatNum(calculateFilteredExpense());
@@ -3982,11 +4163,10 @@
         const box = document.createElement('div');
         box.className = `card-item-box ${typeClass} ${isActive ? 'active-source-box' : ''}`;
         box.onclick = (ev) => {
-          // If clicked specifically on the detail button, don't toggle filter
-          if (ev.target.closest('.card-box-detail-btn')) return;
-          selectSourceFilter(src.id);
+          showCardDetail(src.id);
         };
-        box.title = `${src.name} bo'yicha operatsiyalarni filtrlash`;
+        box.title = `${src.name} — Katta oynada to'liq ko'rish`;
+        box.style.cursor = 'pointer';
 
         box.innerHTML = `
           <div class="card-box-top">
@@ -4090,7 +4270,15 @@
       uz: {
         headerTitle: '💰 Moliya Tracker',
         navIncome: 'Kirim-Chiqim',
+        navHome: 'Asosiy',
         navIncomeOnly: 'Kirimlar',
+        quickIncome: '+ Kirim',
+        quickExpense: '- Chiqim',
+        quickTransfer: "O'tkazma",
+        quickDebt: 'Qarz',
+        recentActivity: "So'nggi operatsiyalar",
+        navPlanning: 'Reja',
+        navAnalytics: 'Tahlil',
         navExpenseOnly: 'Chiqimlar',
         navDebts: 'Qarzlar',
         navExpected: 'Kutilayotgan',
@@ -4405,8 +4593,18 @@
     }
 
     function applySummaryState() {
+      const homeGrid = document.getElementById('homeSummaryGrid');
+      const homeIncomeGrid = document.getElementById('homeIncomeGrid');
       const incomeGrid = document.getElementById('incomeSummaryGrid');
       const incomeExpGrid = document.getElementById('incomeExpenseGrid');
+
+      if (summaryState.home) {
+        if (homeGrid) homeGrid.classList.add('hidden-values');
+        if (homeIncomeGrid) homeIncomeGrid.classList.add('hidden-values');
+      } else {
+        if (homeGrid) homeGrid.classList.remove('hidden-values');
+        if (homeIncomeGrid) homeIncomeGrid.classList.remove('hidden-values');
+      }
       const debtGrid = document.getElementById('debtSummaryGrid');
       const expectedGrid = document.getElementById('expectedSummaryGrid');
       const cardsGrid = document.getElementById('cardsBarContainer');
@@ -4457,8 +4655,19 @@
     function switchTab(tabId, el) {
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      el.classList.add('active');
+      const target = document.getElementById(tabId);
+      if (target) target.classList.add('active');
+      if (el) el.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchTabById(tabId) {
+      const navBtn = document.querySelector(`.nav-item[data-tab="${tabId}"]`);
+      if (navBtn) {
+        switchTab(tabId, navBtn);
+        if (tabId === 'tabPlanning') renderPlanning();
+        if (tabId === 'tabAnalytics') renderAnalytics();
+      }
     }
 
     // =============================================
@@ -4550,41 +4759,267 @@
       expected: { icon: '⏳', labelKey: 'totalExpected', color: 'var(--blue)', bgSoft: 'var(--blue-soft)', border: 'rgba(59, 130, 246, 0.3)' },
     };
 
-    function showAmountDetail(type) {
-      const cfg = DETAIL_CONFIG[type];
-      if (!cfg) return;
+    let activeDetailState = null;
+
+    function showCardDetail(sourceIdOrStat) {
+      let sourceId = '';
+      if (typeof sourceIdOrStat === 'string') {
+        sourceId = sourceIdOrStat;
+      } else if (sourceIdOrStat && sourceIdOrStat.id) {
+        sourceId = sourceIdOrStat.id;
+      }
+      showAmountDetail('cardDetail', sourceId);
+    }
+
+    function showAmountDetail(type, extraId) {
+      activeDetailState = { type, extraId };
 
       const badgeEl = document.getElementById('amountModalBadge');
       const iconEl = document.getElementById('amountDetailIcon');
       const titleEl = document.getElementById('amountDetailTitle');
       const valEl = document.getElementById('amountDetailValue');
       const displayEl = document.getElementById('amountModalDisplay');
+      const statsEl = document.getElementById('amountModalStats');
+      const dynamicActionsEl = document.getElementById('amountModalDynamicActions');
+
+      if (!badgeEl || !iconEl || !titleEl || !valEl) return;
+
+      const { statsMap, totalCash, totalCards, grandTotal } = calculateSourceStats();
+      const allIncome = calculateFilteredIncome(cachedEntries, '', '');
+      const allExpense = calculateFilteredExpense(cachedEntries, '', '');
 
       let valText = '0';
-      if (type === 'grandTotal') valText = document.getElementById('grandTotal').textContent;
-      else if (type === 'cashBalance') valText = document.getElementById('cashBalance').textContent;
-      else if (type === 'cardsBalance') valText = document.getElementById('cardsBalance').textContent;
-      else if (type === 'income') valText = document.getElementById('totalIncome').textContent;
-      else if (type === 'expense') valText = document.getElementById('totalExpense').textContent;
-      else if (type === 'debts') valText = document.getElementById('totalDebts').textContent;
-      else if (type === 'returned') valText = document.getElementById('totalReturned').textContent;
-      else if (type === 'expected') valText = document.getElementById('totalExpected').textContent;
+      let icon = '💰';
+      let title = 'Balans';
+      let color = 'var(--text)';
+      let bgSoft = 'rgba(255,255,255,0.05)';
+      let border = 'var(--border)';
+      let statsHtml = '';
+      let actionsHtml = '';
+
+      if (type === 'grandTotal') {
+        icon = '👑';
+        title = t('grandTotal') || 'Jami Balans';
+        valText = (grandTotal >= 0 ? '+' : '') + formatNum(grandTotal) + " so'm";
+        color = grandTotal >= 0 ? '#60a5fa' : 'var(--red)';
+        bgSoft = 'rgba(59, 130, 246, 0.15)';
+        border = 'rgba(59, 130, 246, 0.35)';
+
+        const posTotal = Math.max(1, (totalCash > 0 ? totalCash : 0) + (totalCards > 0 ? totalCards : 0));
+        const cashPct = Math.max(0, Math.round((Math.max(0, totalCash) / posTotal) * 100));
+        const cardsPct = Math.max(0, Math.round((Math.max(0, totalCards) / posTotal) * 100));
+
+        statsHtml = `
+          <div class="amount-stat-card">
+            <div class="amount-stat-label">💵 Naqd pul (${cashPct}%)</div>
+            <div class="amount-stat-value" style="color:var(--teal)">${formatNum(totalCash)} so'm</div>
+          </div>
+          <div class="amount-stat-card">
+            <div class="amount-stat-label">💳 Kartalar (${cardsPct}%)</div>
+            <div class="amount-stat-value" style="color:var(--blue)">${formatNum(totalCards)} so'm</div>
+          </div>
+          <div class="amount-stat-card">
+            <div class="amount-stat-label">📈 Jami kirim</div>
+            <div class="amount-stat-value" style="color:var(--green)">+${formatNum(allIncome)} so'm</div>
+          </div>
+          <div class="amount-stat-card">
+            <div class="amount-stat-label">📉 Jami chiqim</div>
+            <div class="amount-stat-value" style="color:var(--red)">-${formatNum(allExpense)} so'm</div>
+          </div>
+        `;
+
+        actionsHtml = `
+          <button type="button" class="btn-submit green" style="flex:1; padding:10px;" onclick="closeModal('modalAmountDetail'); openModal('income');">
+            + Kirim qo'shish
+          </button>
+          <button type="button" class="btn-submit purple" style="flex:1; padding:10px;" onclick="closeModal('modalAmountDetail'); openTransferModal();">
+            🔄 O'tkazma
+          </button>
+        `;
+      } else if (type === 'income') {
+        icon = '📈';
+        title = t('totalIncome') || 'Umumiy Kirim';
+        valText = '+' + formatNum(allIncome) + " so'm";
+        color = 'var(--green)';
+        bgSoft = 'var(--green-soft)';
+        border = 'rgba(34, 197, 94, 0.3)';
+
+        const incomeEntries = cachedEntries.filter(e => e.type === 'income');
+        const nowPrefix = todayStr().slice(0, 7);
+        const thisMonthInc = incomeEntries.filter(e => e.date && e.date.startsWith(nowPrefix)).reduce((acc, e) => acc + (e.amount || 0), 0);
+        const avgInc = incomeEntries.length > 0 ? Math.round(allIncome / incomeEntries.length) : 0;
+
+        statsHtml = `
+          <div class="amount-stat-card">
+            <div class="amount-stat-label">📅 Shu oydagi kirim</div>
+            <div class="amount-stat-value" style="color:var(--green)">+${formatNum(thisMonthInc)} so'm</div>
+          </div>
+          <div class="amount-stat-card">
+            <div class="amount-stat-label">🔢 Jami tushumlar soni</div>
+            <div class="amount-stat-value">${incomeEntries.length} ta</div>
+          </div>
+          <div class="amount-stat-card" style="grid-column: span 2;">
+            <div class="amount-stat-label">📊 O'rtacha kirim miqdori</div>
+            <div class="amount-stat-value" style="color:var(--teal)">${formatNum(avgInc)} so'm</div>
+          </div>
+        `;
+
+        actionsHtml = `
+          <button type="button" class="btn-submit green" style="flex:1; padding:10px;" onclick="closeModal('modalAmountDetail'); openModal('income');">
+            + Yangi Kirim
+          </button>
+          <button type="button" class="btn-text-action" style="flex:1; padding:10px; justify-content:center;" onclick="closeModal('modalAmountDetail'); switchTabById('tabIncome');">
+            📈 Kirimlar oynasiga o'tish
+          </button>
+        `;
+      } else if (type === 'cashBalance') {
+        icon = '💵';
+        title = t('cashBalance') || 'Naqd Balans';
+        valText = (totalCash >= 0 ? '+' : '') + formatNum(totalCash) + " so'm";
+        color = totalCash >= 0 ? 'var(--teal)' : 'var(--red)';
+        bgSoft = 'var(--teal-soft)';
+        border = 'rgba(20, 184, 166, 0.3)';
+
+        let cashIn = 0, cashOut = 0, cashCount = 0;
+        cachedEntries.forEach(e => {
+          if (isCashSource(e.source, '')) {
+            if (e.type === 'income') { cashIn += e.amount; cashCount++; }
+            if (e.type === 'expense') { cashOut += e.amount; cashCount++; }
+          }
+        });
+
+        statsHtml = `
+          <div class="amount-stat-card">
+            <div class="amount-stat-label">📈 Naqdga kirim</div>
+            <div class="amount-stat-value" style="color:var(--green)">+${formatNum(cashIn)} so'm</div>
+          </div>
+          <div class="amount-stat-card">
+            <div class="amount-stat-label">📉 Naqd xarajatlar</div>
+            <div class="amount-stat-value" style="color:var(--red)">-${formatNum(cashOut)} so'm</div>
+          </div>
+          <div class="amount-stat-card" style="grid-column: span 2;">
+            <div class="amount-stat-label">🔢 Naqd operatsiyalar soni</div>
+            <div class="amount-stat-value">${cashCount} ta</div>
+          </div>
+        `;
+
+        actionsHtml = `
+          <button type="button" class="btn-submit purple" style="flex:1; padding:10px;" onclick="closeModal('modalAmountDetail'); openTransferModal();">
+            🔄 Kartaga o'tkazish
+          </button>
+          <button type="button" class="btn-submit green" style="flex:1; padding:10px;" onclick="closeModal('modalAmountDetail'); openModal('income'); document.getElementById('entrySource').value='cash';">
+            + Naqd kirim
+          </button>
+        `;
+      } else if (type === 'cardsBalance') {
+        icon = '💳';
+        title = t('cardsBalance') || 'Kartalar Jamisi';
+        valText = (totalCards >= 0 ? '+' : '') + formatNum(totalCards) + " so'm";
+        color = totalCards >= 0 ? 'var(--blue)' : 'var(--red)';
+        bgSoft = 'var(--blue-soft)';
+        border = 'rgba(59, 130, 246, 0.3)';
+
+        const sources = getSources();
+        const cardSources = sources.filter(s => !isCashSource(s.id, s.name, s.type));
+
+        let cardRows = cardSources.map(cs => {
+          const st = statsMap[cs.id] || { balance: 0 };
+          return `<div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:12px;">
+            <span style="color:var(--text-muted)">💳 ${esc(cs.name)}</span>
+            <span style="font-weight:700; color:${st.balance >= 0 ? 'var(--blue)' : 'var(--red)'}">${formatNum(st.balance)} so'm</span>
+          </div>`;
+        }).join('');
+
+        statsHtml = `
+          <div class="amount-stat-card" style="grid-column: span 2; max-height:140px; overflow-y:auto;">
+            <div class="amount-stat-label">💳 Kartalar qoldig'i (${cardSources.length} ta)</div>
+            <div style="margin-top:6px;">${cardRows || '<div style="color:var(--text-muted)">Kartalar topilmadi</div>'}</div>
+          </div>
+        `;
+
+        actionsHtml = `
+          <button type="button" class="btn-submit purple" style="flex:1; padding:10px;" onclick="closeModal('modalAmountDetail'); openTransferModal();">
+            🔄 O'tkazma qilish
+          </button>
+          <button type="button" class="btn-text-action" style="flex:1; padding:10px; justify-content:center;" onclick="closeModal('modalAmountDetail'); openSourcesModal();">
+            ⚙️ Boshqarish
+          </button>
+        `;
+      } else if (type === 'cardDetail') {
+        const srcId = extraId || (getSources()[0] ? getSources()[0].id : 'cash');
+        const stat = statsMap[srcId] || { name: srcId, type: 'card', balance: 0, income: 0, expense: 0, transferIn: 0, transferOut: 0, initialBalance: 0 };
+
+        icon = stat.type === 'cash' ? '💵' : '💳';
+        title = `${stat.name} — ${t('cardBalance')}`;
+        valText = (stat.balance >= 0 ? '+' : '') + formatNum(stat.balance) + " so'm";
+        color = stat.balance >= 0 ? 'var(--green)' : 'var(--red)';
+        bgSoft = stat.type === 'cash' ? 'var(--teal-soft)' : 'var(--blue-soft)';
+        border = stat.type === 'cash' ? 'rgba(20, 184, 166, 0.3)' : 'rgba(59, 130, 246, 0.3)';
+
+        statsHtml = `
+          <div class="amount-stat-card">
+            <div class="amount-stat-label">🏦 Boshlang'ich balans</div>
+            <div class="amount-stat-value">${formatNum(stat.initialBalance || 0)} so'm</div>
+          </div>
+          <div class="amount-stat-card">
+            <div class="amount-stat-label">📈 Tushumlar</div>
+            <div class="amount-stat-value" style="color:var(--green)">+${formatNum(stat.income)} so'm</div>
+          </div>
+          <div class="amount-stat-card">
+            <div class="amount-stat-label">📉 Chiqimlar</div>
+            <div class="amount-stat-value" style="color:var(--red)">-${formatNum(stat.expense)} so'm</div>
+          </div>
+          <div class="amount-stat-card">
+            <div class="amount-stat-label">🔄 O'tkazmalar balansi</div>
+            <div class="amount-stat-value" style="color:var(--purple)">+${formatNum(stat.transferIn)} / -${formatNum(stat.transferOut)}</div>
+          </div>
+        `;
+
+        actionsHtml = `
+          <button type="button" class="btn-submit purple" style="flex:1; padding:10px;" onclick="closeModal('modalAmountDetail'); openTransferModal();">
+            🔄 Shu hisobdan o'tkazish
+          </button>
+          <button type="button" class="btn-submit green" style="flex:1; padding:10px;" onclick="closeModal('modalAmountDetail'); openModal('income'); document.getElementById('entrySource').value='${srcId}';">
+            + Kirim qilish
+          </button>
+        `;
+      } else {
+        const cfg = DETAIL_CONFIG[type] || { icon: '💰', labelKey: type, color: '#60a5fa', bgSoft: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.35)' };
+        icon = cfg.icon;
+        title = t(cfg.labelKey);
+        if (type === 'expense') valText = (document.getElementById('totalExpense')?.textContent || '0') + " so'm";
+        else if (type === 'debts') valText = (document.getElementById('totalDebts')?.textContent || '0') + " so'm";
+        else if (type === 'returned') valText = (document.getElementById('totalReturned')?.textContent || '0') + " so'm";
+        color = cfg.color;
+        bgSoft = cfg.bgSoft;
+        border = cfg.border;
+      }
 
       currentDetailRawValue = valText;
-      iconEl.textContent = cfg.icon;
-      titleEl.textContent = t(cfg.labelKey);
+      iconEl.textContent = icon;
+      titleEl.textContent = title;
       valEl.textContent = valText;
-      valEl.style.color = cfg.color;
+      valEl.style.color = color;
 
-      badgeEl.style.background = cfg.bgSoft;
-      badgeEl.style.borderColor = cfg.border;
-      badgeEl.style.color = cfg.color;
-      displayEl.style.borderColor = cfg.border;
+      badgeEl.style.background = bgSoft;
+      badgeEl.style.borderColor = border;
+      badgeEl.style.color = color;
+      displayEl.style.borderColor = border;
+
+      if (statsEl) statsEl.innerHTML = statsHtml;
+      if (dynamicActionsEl) dynamicActionsEl.innerHTML = actionsHtml;
 
       const copyTxt = document.getElementById('copyAmountText');
       if (copyTxt) copyTxt.textContent = t('copy');
 
       document.getElementById('modalAmountDetail').classList.add('active');
+    }
+
+    function updateActiveDetailModal() {
+      const modal = document.getElementById('modalAmountDetail');
+      if (modal && modal.classList.contains('active') && activeDetailState) {
+        showAmountDetail(activeDetailState.type, activeDetailState.extraId);
+      }
     }
 
     function showPersonTotalDetail() {
@@ -4863,6 +5298,9 @@
       renderIncomeOnlyList();
       renderExpenseOnlyList();
       recalculateAndRenderAll();
+      renderRecentHomeList();
+      renderBudgets();
+      if (typeof renderAnalytics === 'function') renderAnalytics();
     }
 
     function renderIncomeOnlyList() {
@@ -5705,6 +6143,65 @@
     store.on('debts', renderDebtList);
 
     // =============================================
+    
+    // =============================================
+    // RECENT HOME TRANSACTIONS
+    // =============================================
+    function renderRecentHomeList() {
+      const container = document.getElementById('recentHomeList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const items = (cachedEntries || []).slice(0, 6);
+      if (items.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state" style="padding: 24px 10px;">
+            <div class="empty-icon" style="font-size:32px;">📑</div>
+            <div class="empty-text" data-i18n="noEntries">Hali operatsiyalar yo'q</div>
+          </div>
+        `;
+        return;
+      }
+
+      items.forEach(e => {
+        const isIncome = e.type === 'income';
+        const isExpense = e.type === 'expense';
+        const isTransfer = e.type === 'transfer';
+
+        const icon = isIncome ? '📈' : isExpense ? '📉' : '🔄';
+        const iconClass = isIncome ? 'income' : isExpense ? 'expense' : 'transfer';
+        const amtClass = isIncome ? 'income' : isExpense ? 'expense' : 'transfer';
+        const prefix = isIncome ? '+' : isExpense ? '-' : '';
+
+        let sourceLabel = '';
+        if (isTransfer) {
+          sourceLabel = `${getSourceName(e.fromSource)} ➔ ${getSourceName(e.toSource)}`;
+        } else {
+          sourceLabel = getSourceName(e.source);
+        }
+
+        const item = document.createElement('div');
+        item.className = 'entry-card';
+        item.style.padding = '12px 14px';
+        item.innerHTML = `
+          <div class="entry-icon ${iconClass}" style="width:38px; height:38px; font-size:18px;">${icon}</div>
+          <div class="entry-info">
+            <div class="entry-reason" style="font-size:14px;">${esc(e.reason || (isTransfer ? "O'tkazma" : "Operatsiya"))}</div>
+            <div class="entry-meta" style="font-size:12px;">
+              <span>${formatDate(e.date)}${e.time ? ' ' + e.time : ''}</span>
+              <span style="margin: 0 4px;">•</span>
+              <span class="entry-source" style="margin-top:0;">${esc(sourceLabel)}</span>
+            </div>
+          </div>
+          <div class="entry-amount ${amtClass}" style="font-size:15px;">
+            ${prefix}${formatNum(e.amount)}
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // =============================================
     // ANALYTICS LOGIC
     // =============================================
     let piePeriod = 'month';
@@ -6164,14 +6661,70 @@
     }
 
     // =============================================
-    // PLANNING SYSTEM (Budget, Goals, Recurring)
+    // PLANNING SYSTEM (Budget, Goals, Recurring) — FIREBASE REALTIME SYNC
     // =============================================
+    let cachedPlanning = {
+      budgets: [],
+      goals: [],
+      recurring: []
+    };
 
     function getPlanningData(key) {
-      try { return JSON.parse(localStorage.getItem('fin_' + key) || '[]'); } catch(e) { return []; }
+      if (cachedPlanning[key] && cachedPlanning[key].length > 0) return cachedPlanning[key];
+      try {
+        const d = JSON.parse(localStorage.getItem('fin_' + key) || '[]');
+        cachedPlanning[key] = d;
+        return d;
+      } catch(e) {
+        return [];
+      }
     }
+
     function setPlanningData(key, data) {
+      cachedPlanning[key] = data;
       localStorage.setItem('fin_' + key, JSON.stringify(data));
+      if (useFirebase && db) {
+        db.ref('planning/' + key).set(data);
+      }
+    }
+
+    function initPlanningSync() {
+      if (useFirebase && db) {
+        db.ref('planning/budgets').on('value', snap => {
+          const val = snap.val();
+          let arr = [];
+          if (Array.isArray(val)) arr = val.filter(Boolean);
+          else if (val && typeof val === 'object') arr = Object.values(val);
+          cachedPlanning.budgets = arr;
+          localStorage.setItem('fin_budgets', JSON.stringify(arr));
+          renderBudgets();
+        });
+
+        db.ref('planning/goals').on('value', snap => {
+          const val = snap.val();
+          let arr = [];
+          if (Array.isArray(val)) arr = val.filter(Boolean);
+          else if (val && typeof val === 'object') arr = Object.values(val);
+          cachedPlanning.goals = arr;
+          localStorage.setItem('fin_goals', JSON.stringify(arr));
+          renderGoals();
+        });
+
+        db.ref('planning/recurring').on('value', snap => {
+          const val = snap.val();
+          let arr = [];
+          if (Array.isArray(val)) arr = val.filter(Boolean);
+          else if (val && typeof val === 'object') arr = Object.values(val);
+          cachedPlanning.recurring = arr;
+          localStorage.setItem('fin_recurring', JSON.stringify(arr));
+          renderRecurring();
+        });
+      } else {
+        cachedPlanning.budgets = getPlanningData('budgets');
+        cachedPlanning.goals = getPlanningData('goals');
+        cachedPlanning.recurring = getPlanningData('recurring');
+        renderPlanning();
+      }
     }
 
     // --- BUDGET ---
@@ -6572,9 +7125,11 @@
     // =============================================
     checkAuth();
     initSourcesSync();
+    initPlanningSync();
     populateSourceSelects();
     applySummaryState();
     setLang(currentLang);
+    renderRecentHomeList();
     requestNotificationPermission();
   </script>
 </body>
